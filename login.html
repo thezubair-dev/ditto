@@ -535,15 +535,11 @@
             await updateProfile(userCredential.user, { displayName: name });
           }
           showToast('Account created successfully! Welcome to Ditto.', 'success');
-          setTimeout(() => {
-            // window.location.href = 'dashboard.html';
-          }, 1500);
+          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
         } else {
           await signInWithEmailAndPassword(auth, email, password);
           showToast('Signed in successfully!', 'success');
-          setTimeout(() => {
-            // window.location.href = 'dashboard.html';
-          }, 1500);
+          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
         }
       } catch (error) {
         let msg = error.message;
