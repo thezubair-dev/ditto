@@ -24,27 +24,8 @@
     }
     @keyframes bgMove { 100% { transform: scale(1.08); } }
 
-    /* Bottom Nav */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: 64px; background: rgba(5, 5, 16, 0.85);
-      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      display: flex; justify-content: space-around; align-items: center;
-      z-index: 1000; padding: 0 10px;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 3px; color: #64748b; text-decoration: none;
-      font-size: 11px; font-weight: 500; transition: all 0.3s ease;
-      cursor: pointer; padding: 6px 16px; border-radius: 12px;
-    }
-    .nav-item .icon { font-size: 20px; }
-    .nav-item:hover, .nav-item.active { color: #a78bfa; }
-    .nav-item.active { background: rgba(139, 92, 246, 0.08); }
-
     .profile-header {
-      padding: 30px 6% 20px; text-align: center;
+      padding: 30px 6% 20px; text-align: center; position: relative;
     }
     .profile-avatar {
       width: 100px; height: 100px; border-radius: 50%;
@@ -53,6 +34,11 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 50px; margin: 0 auto 16px;
       box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+      animation: avatarPulse 3s ease-in-out infinite;
+    }
+    @keyframes avatarPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.15); }
+      50% { box-shadow: 0 0 60px rgba(139, 92, 246, 0.25); }
     }
     .profile-name {
       font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700;
@@ -65,18 +51,31 @@
       margin-bottom: 8px;
     }
     .profile-bio {
-      color: #94a3b8; font-size: 14px; max-width: 320px; margin: 0 auto 20px;
+      color: #94a3b8; font-size: 14px; max-width: 320px; margin: 0 auto 24px;
       line-height: 1.5;
     }
 
     .stats-row {
-      display: flex; justify-content: center; gap: 24px; margin-bottom: 24px;
+      display: flex; justify-content: center; gap: 16px; margin-bottom: 24px;
     }
-    .stat-item { text-align: center; }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-radius: 18px; padding: 16px 24px; text-align: center;
+      min-width: 90px; transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      border-color: rgba(139, 92, 246, 0.2);
+      transform: translateY(-2px);
+    }
     .stat-value {
-      font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: white;
+      font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 800;
+      background: linear-gradient(90deg, #a855f7, #06b6d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 4px;
     }
-    .stat-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
 
     .section-card {
       background: rgba(255, 255, 255, 0.04);
@@ -97,6 +96,9 @@
     .trait-row:last-child { border-bottom: none; }
     .trait-label { font-size: 14px; color: #94a3b8; }
     .trait-value { font-size: 14px; font-weight: 600; color: white; }
+    .trait-value.energy { color: #a78bfa; }
+    .trait-value.heart { color: #06b6d4; }
+    .trait-value.drive { color: #10b981; }
 
     .mood-tags {
       display: flex; flex-wrap: wrap; gap: 8px;
@@ -107,6 +109,35 @@
       border: 1px solid rgba(139, 92, 246, 0.2);
       font-size: 13px; color: #c4b5fd;
     }
+
+    .loading {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 60vh; color: #64748b; font-size: 15px; gap: 16px;
+    }
+    .loading .spinner {
+      width: 40px; height: 40px; border: 3px solid rgba(139,92,246,0.2);
+      border-top-color: #8b5cf6; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 64px; background: rgba(5, 5, 16, 0.85);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 1000; padding: 0 10px;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; color: #64748b; text-decoration: none;
+      font-size: 11px; font-weight: 500; transition: all 0.3s ease;
+      cursor: pointer; padding: 6px 16px; border-radius: 12px;
+    }
+    .nav-item .icon { font-size: 20px; }
+    .nav-item:hover, .nav-item.active { color: #a78bfa; }
+    .nav-item.active { background: rgba(139, 92, 246, 0.08); }
 
     .toast {
       position: fixed; bottom: 80px; left: 50%;
@@ -122,14 +153,23 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { background: rgba(239, 68, 68, 0.95); }
 
-    .loading {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 60vh; color: #64748b; font-size: 15px;
+    .error-state {
+      text-align: center; padding: 60px 20px; color: #f87171;
+    }
+    .error-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin-bottom: 8px; }
+    .error-state p { font-size: 14px; color: #94a3b8; }
+    .retry-btn {
+      margin-top: 16px; padding: 10px 24px; border-radius: 30px;
+      background: rgba(139, 92, 246, 0.2); color: #a78bfa;
+      border: 1px solid rgba(139, 92, 246, 0.3); cursor: pointer;
+      font-size: 14px; font-family: 'Inter', sans-serif;
     }
 
     @media(max-width: 480px) {
       .profile-avatar { width: 80px; height: 80px; font-size: 40px; }
       .profile-name { font-size: 20px; }
+      .stat-card { padding: 12px 18px; min-width: 80px; }
+      .stat-value { font-size: 22px; }
     }
   </style>
 <base target="_blank">
@@ -137,7 +177,16 @@
 <body>
   <div class="bg" aria-hidden="true"></div>
 
-  <div id="loadingState" class="loading">Loading your profile...</div>
+  <div id="loadingState" class="loading">
+    <div class="spinner"></div>
+    <div>Loading your profile...</div>
+  </div>
+
+  <div id="errorState" class="error-state" style="display:none;">
+    <h3>Something went wrong</h3>
+    <p id="errorText">Could not load your profile.</p>
+    <button class="retry-btn" onclick="location.reload()">Try Again</button>
+  </div>
 
   <div id="profileContent" style="display:none;">
     <div class="profile-header">
@@ -147,15 +196,15 @@
       <div class="profile-bio" id="profileBio">...</div>
 
       <div class="stats-row">
-        <div class="stat-item">
+        <div class="stat-card">
           <div class="stat-value" id="statDittos">0</div>
-          <div class="stat-label">Dittos</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="statDitts">0</div>
           <div class="stat-label">Ditts</div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
+          <div class="stat-value" id="statDittosMatches">0</div>
+          <div class="stat-label">Dittos</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-value" id="statMatches">0</div>
           <div class="stat-label">Matches</div>
         </div>
@@ -164,9 +213,9 @@
 
     <div class="section-card">
       <div class="section-title">Your Personality</div>
-      <div class="trait-row"><span class="trait-label">Energy Style</span><span class="trait-value" id="traitEnergy">-</span></div>
-      <div class="trait-row"><span class="trait-label">Heart Style</span><span class="trait-value" id="traitHeart">-</span></div>
-      <div class="trait-row"><span class="trait-label">Core Drive</span><span class="trait-value" id="traitDrive">-</span></div>
+      <div class="trait-row"><span class="trait-label">Energy Style</span><span class="trait-value energy" id="traitEnergy">-</span></div>
+      <div class="trait-row"><span class="trait-label">Heart Style</span><span class="trait-value heart" id="traitHeart">-</span></div>
+      <div class="trait-row"><span class="trait-label">Core Drive</span><span class="trait-value drive" id="traitDrive">-</span></div>
       <div class="trait-row"><span class="trait-label">Conflict Style</span><span class="trait-value" id="traitConflict">-</span></div>
     </div>
 
@@ -176,8 +225,8 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="icon">&#127968;</span>Home</a>
     <a href="ditts.html" class="nav-item"><span class="icon">&#128172;</span>Ditts</a>
     <a href="dittos.html" class="nav-item"><span class="icon">&#129309;</span>Dittos</a>
     <a href="profile.html" class="nav-item active"><span class="icon">&#128100;</span>Profile</a>
@@ -188,7 +237,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
@@ -204,43 +253,72 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;' };
+    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;', '7': '&#129782;', '8': '&#129309;', '9': '&#128068;', '10': '&#9995;' };
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) { window.location.href = 'login.html'; return; }
-
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists() || !userDoc.data().profileComplete) {
-        window.location.href = 'quiz.html';
+      if (!user) {
+        window.location.href = 'login.html';
         return;
       }
 
-      const data = userDoc.data();
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('profileContent').style.display = 'block';
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists()) {
+          showError('Profile not found. Please complete the quiz first.');
+          setTimeout(() => window.location.href = 'quiz.html', 2000);
+          return;
+        }
 
-      document.getElementById('profileName').textContent = data.displayName || 'Ditto User';
-      document.getElementById('profileDittoid').textContent = data.dittoidCode || 'd/---';
-      document.getElementById('profileBio').textContent = data.bio || '';
-      document.getElementById('profileAvatar').innerHTML = avatars[data.avatar] || '&#129504;';
+        const data = userDoc.data();
+        if (!data.profileComplete) {
+          window.location.href = 'quiz.html';
+          return;
+        }
 
-      document.getElementById('traitEnergy').textContent = capitalize(data.dittoid?.energy || '-');
-      document.getElementById('traitHeart').textContent = capitalize(data.dittoid?.heart || '-');
-      document.getElementById('traitDrive').textContent = capitalize(data.dittoid?.drive || '-');
-      document.getElementById('traitConflict').textContent = data.conflictStyle || '-';
+        // Count real matches
+        let matchCount = 0;
+        try {
+          const q1 = query(collection(db, 'matches'), where('user1', '==', user.uid));
+          const q2 = query(collection(db, 'matches'), where('user2', '==', user.uid));
+          const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+          matchCount = s1.size + s2.size;
+        } catch(e) { console.log("Match count error:", e); }
 
-      const moodContainer = document.getElementById('moodTags');
-      if (data.moodTags && data.moodTags.length > 0) {
-        moodContainer.innerHTML = data.moodTags.map(m => `<span class="mood-tag">${m}</span>`).join('');
-      } else {
-        moodContainer.innerHTML = '<span style="color:#64748b;font-size:13px;">No mood selected</span>';
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+
+        document.getElementById('profileName').textContent = data.displayName || 'Ditto User';
+        document.getElementById('profileDittoid').textContent = data.dittoidCode || 'd/---';
+        document.getElementById('profileBio').textContent = data.bio || 'No bio yet';
+        document.getElementById('profileAvatar').innerHTML = avatars[data.avatar] || '&#129504;';
+
+        document.getElementById('traitEnergy').textContent = capitalize(data.dittoid?.energy || '-');
+        document.getElementById('traitHeart').textContent = capitalize(data.dittoid?.heart || '-');
+        document.getElementById('traitDrive').textContent = capitalize(data.dittoid?.drive || '-');
+        document.getElementById('traitConflict').textContent = data.conflictStyle || '-';
+
+        const moodContainer = document.getElementById('moodTags');
+        if (data.moodTags && data.moodTags.length > 0) {
+          moodContainer.innerHTML = data.moodTags.map(m => `<span class="mood-tag">${m}</span>`).join('');
+        } else {
+          moodContainer.innerHTML = '<span style="color:#64748b;font-size:13px;">No mood selected</span>';
+        }
+
+        document.getElementById('statDittos').textContent = data.dittsCount || 0;
+        document.getElementById('statDittosMatches').textContent = data.dittosCount || 0;
+        document.getElementById('statMatches').textContent = matchCount;
+
+      } catch (err) {
+        console.error("Profile load error:", err);
+        showError('Failed to load profile: ' + err.message);
       }
-
-      // Stats (placeholder - will be populated from other collections)
-      document.getElementById('statDittos').textContent = data.dittosCount || 0;
-      document.getElementById('statDitts').textContent = data.dittsCount || 0;
-      document.getElementById('statMatches').textContent = data.matchesCount || 0;
     });
+
+    function showError(msg) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      document.getElementById('errorText').textContent = msg;
+    }
 
     function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '-'; }
   </script>
