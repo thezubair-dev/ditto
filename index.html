@@ -67,7 +67,6 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* DITTO LOGO */
     .logo {
       display: flex;
       align-items: center;
@@ -164,14 +163,272 @@
       box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
     }
 
-    /* ===== PREVIEW CARD ===== */
-    .preview-container {
-      width: 100%;
-      max-width: 480px;
-      margin: 50px auto 0;
-      padding: 0 16px;
+    /* ===== DITTO LOGO ===== */
+    .ditto-logo-nav {
+      width: 38px;
+      height: 38px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
     }
-    .glass-card {
+    .mind-nav {
+      width: 13px;
+      height: 18px;
+      position: absolute;
+      top: 8px;
+      border-radius: 60% 60% 35% 60%;
+    }
+    .left-nav {
+      left: 4px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      transform: rotate(-35deg);
+    }
+    .right-nav {
+      right: 4px;
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+      transform: rotate(145deg);
+    }
+
+    .ditto-logo-hero {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin: 0 auto 30px;
+      cursor: pointer;
+    }
+    .mind-hero {
+      width: 38px;
+      height: 56px;
+      position: absolute;
+      top: 28px;
+      border-radius: 60% 60% 35% 60%;
+      transition: 0.6s cubic-bezier(.2,1,.3,1);
+    }
+    .left-hero {
+      left: 24px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      transform: rotate(-35deg);
+    }
+    .right-hero {
+      right: 24px;
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+      transform: rotate(145deg);
+    }
+    .ditto-logo-hero:hover .left-hero {
+      transform: translateX(18px) rotate(-35deg);
+      background: white;
+      box-shadow: 0 0 25px rgba(255,255,255,0.8);
+    }
+    .ditto-logo-hero:hover .right-hero {
+      transform: translateX(-18px) rotate(145deg);
+      background: white;
+      box-shadow: 0 0 25px rgba(255,255,255,0.8);
+    }
+
+    /* ============================================ */
+    /* ===== FLOATING THOUGHTS — CLEAN MARQUEE ===== */
+    /* ============================================ */
+    .thought-marquee {
+      padding: 60px 0 80px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Soft ambient glow behind the marquee area */
+    .thought-marquee::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 70%;
+      background: radial-gradient(ellipse, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .marquee-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      position: relative;
+      z-index: 1;
+    }
+    .marquee-title span {
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .marquee-sub {
+      text-align: center;
+      color: #64748b;
+      font-size: clamp(14px, 2vw, 16px);
+      margin-bottom: 50px;
+      letter-spacing: 0.5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================ */
+    /* FIX 1: Shadow Clipping — padded container    */
+    /* ============================================ */
+    .slider {
+      overflow: hidden;
+      position: relative;
+      padding: 30px 0;      /* breathing room for shadows */
+      margin-top: -20px;   /* pull content back visually */
+      margin-bottom: -4px;
+      z-index: 1;
+    }
+    .slider:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ============================================ */
+    /* FIX 2: Transparent fade — rgba, not hex      */
+    /* ============================================ */
+    .slider::before,
+    .slider::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 200px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .slider::before {
+      left: 0;
+      background: linear-gradient(90deg, rgba(5,5,16,1) 0%, rgba(5,5,16,0) 100%);
+    }
+    .slider::after {
+      right: 0;
+      background: linear-gradient(-90deg, rgba(5,5,16,1) 0%, rgba(5,5,16,0) 100%);
+    }
+
+    /* Moving track */
+    .track {
+      display: flex;
+      gap: 25px;
+      width: max-content;
+    }
+
+    .leftMove {
+      animation: moveLeft 45s linear infinite;
+    }
+    .rightMove {
+      animation: moveRight 45s linear infinite;
+    }
+
+    .track:hover {
+      animation-play-state: paused;
+    }
+
+    /* ============================================ */
+    /* FIX 3: Soft alpha shadow — no pure black     */
+    /* ============================================ */
+    .card {
+      width: 330px;
+      padding: 25px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      flex-shrink: 0;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 0 60px rgba(139, 92, 246, 0.05);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: rgba(139, 92, 246, 0.25);
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(139, 92, 246, 0.15) inset,
+        0 0 80px rgba(139, 92, 246, 0.1);
+    }
+
+    .user {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: white;
+    }
+    .text {
+      line-height: 1.5;
+      color: #e5e7eb;
+      font-size: 14px;
+    }
+    .trans {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-style: italic;
+      border-left: 2px solid rgba(139, 92, 246, 0.3);
+      padding-left: 10px;
+    }
+    .match {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .match-green { color: #10b981; }
+    .match-yellow { color: #fbbf24; }
+
+    @keyframes moveLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    @keyframes moveRight {
+      from { transform: translateX(-50%); }
+      to { transform: translateX(0); }
+    }
+
+    /* ===== WHY DITTO ===== */
+    .why-ditto {
+      padding: 60px 6% 80px;
+      text-align: center;
+    }
+    .why-ditto h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      margin-bottom: 30px;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .why-ditto .quote {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(20px, 3vw, 30px);
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 50px;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .compare-card {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(20px);
@@ -179,109 +436,47 @@
       padding: 28px;
       border-radius: 24px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      text-align: left;
-      position: relative;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .glass-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(139, 92, 246, 0.1);
-      border-color: rgba(139, 92, 246, 0.2);
-    }
-    .card-badge {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      background: rgba(6, 182, 212, 0.15);
-      border: 1px solid #06b6d4;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      color: #06b6d4;
-      font-weight: 600;
-    }
-    .card-tag {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 4px 12px;
-      border-radius: 15px;
-      font-size: 12px;
-      margin-right: 6px;
-      color: #cbd5e1;
-    }
-
-    /* ===== THOUGHTS PREVIEW (small section) ===== */
-    .thoughts-preview {
-      padding: 40px 6% 60px;
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    .thoughts-preview h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(22px, 3vw, 32px);
+    .compare-card .icon { font-size: 22px; margin-bottom: 14px; }
+    .compare-card .label {
+      font-size: 14px;
       font-weight: 700;
-      text-align: center;
-      margin-bottom: 8px;
-      background: linear-gradient(90deg, #fff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .thoughts-preview > p {
-      text-align: center;
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 30px;
-    }
-    .thoughts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .thought-card .thought-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .thought-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      background: rgba(139, 92, 246, 0.2);
-      flex-shrink: 0;
-    }
-    .thought-meta { display: flex; flex-direction: column; }
-    .thought-name { font-weight: 600; font-size: 14px; }
-    .thought-id { font-size: 11px; color: #64748b; }
-    .thought-content {
-      font-size: 14px;
-      line-height: 1.5;
-      color: #e2e8f0;
-      margin-bottom: 12px;
-    }
-    .thought-actions {
-      display: flex;
-      gap: 14px;
-    }
-    .thought-action {
-      font-size: 12px;
-      color: #64748b;
-      cursor: pointer;
-      transition: color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      border: none;
-      background: none;
-      font-family: 'Inter', sans-serif;
+    .label-red { color: #f87171; }
+    .label-green { color: #34d399; }
+    .compare-card ul {
+      list-style: none;
       padding: 0;
+      margin: 0;
     }
-    .thought-action:hover { color: #a78bfa; }
+    .compare-card li {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 2;
+      padding-left: 16px;
+      position: relative;
+    }
+    .compare-card li span {
+      position: absolute;
+      left: 0;
+    }
+    .dot-red { color: #f87171; }
+    .dot-green { color: #34d399; }
+
+    /* ===== FINAL CTA ===== */
+    .final-cta {
+      text-align: center;
+      padding: 40px 6% 80px;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-large {
+      font-size: 18px;
+      padding: 18px 48px;
+    }
 
     /* ===== FOOTER ===== */
     footer {
@@ -291,17 +486,19 @@
       color: #475569;
       font-size: 13px;
     }
-    footer .logo-text {
+    footer .footer-logo {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
       background: linear-gradient(90deg, #a855f7, #06b6d4);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       display: inline-block;
-      margin-bottom: 6px;
+      margin-bottom: 12px;
     }
+    footer p { color: #94a3b8; font-size: 14px; line-height: 1.6; }
+    footer .copy { margin-top: 20px; color: #475569; font-size: 12px; }
 
     /* ===== TOAST ===== */
     .toast {
@@ -352,19 +549,46 @@
         width: 100%;
         max-width: 300px;
       }
-      .preview-container {
-        margin-top: 35px;
-      }
-      .thoughts-preview {
-        padding: 30px 5% 40px;
-      }
-      .thoughts-grid {
-        grid-template-columns: 1fr;
-      }
       .light { display: none; }
       .bg { filter: blur(50px); }
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+      .slider::before,
+      .slider::after {
+        width: 80px;
+      }
+      .card {
+        width: 280px;
+        padding: 20px;
+      }
     }
 
+    @media(max-width: 768px) {
+      .ditto-logo-hero {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 20px;
+      }
+      .mind-hero {
+        width: 28px;
+        height: 42px;
+        top: 20px;
+      }
+      .left-hero { left: 14px; }
+      .right-hero { right: 14px; }
+      .ditto-logo-nav {
+        width: 32px;
+        height: 32px;
+      }
+      .mind-nav {
+        width: 11px;
+        height: 15px;
+        top: 7px;
+      }
+      .left-nav { left: 3px; }
+      .right-nav { right: 3px; }
+    }
     @media(max-width: 480px) {
       h1 {
         font-size: 28px;
@@ -373,16 +597,9 @@
       .hero-subtitle {
         font-size: 14px;
       }
-      .glass-card {
-        padding: 22px;
-      }
-      .card-badge {
-        position: static;
-        display: inline-block;
-        margin-bottom: 10px;
-      }
     }
   </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -393,141 +610,217 @@
   <!-- NAVBAR -->
   <nav>
     <a href="#" class="logo" onclick="window.scrollTo(0,0); return false;">
-      <!-- DITTO LOGO SVG -->
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" stroke="url(#orbitGrad)" stroke-width="1.5" opacity="0.4"/>
-        <circle cx="50" cy="50" r="32" fill="url(#innerGrad)" opacity="0.3"/>
-        <path d="M35 45 C35 35, 42 28, 50 28 C58 28, 65 35, 65 45 C65 50, 62 54, 58 56 L58 62 C58 66, 54 70, 50 70 C46 70, 42 66, 42 62 L42 56 C38 54, 35 50, 35 45Z"
-              fill="url(#brainGrad)" opacity="0.9"/>
-        <circle cx="50" cy="38" r="3" fill="#06b6d4"/>
-        <circle cx="42" cy="48" r="2.5" fill="#8b5cf6"/>
-        <circle cx="58" cy="48" r="2.5" fill="#10b981"/>
-        <circle cx="50" cy="58" r="2" fill="#ff0080"/>
-        <line x1="50" y1="38" x2="42" y2="48" stroke="url(#lineGrad1)" stroke-width="1" opacity="0.6"/>
-        <line x1="50" y1="38" x2="58" y2="48" stroke="url(#lineGrad2)" stroke-width="1" opacity="0.6"/>
-        <line x1="42" y1="48" x2="50" y2="58" stroke="url(#lineGrad3)" stroke-width="1" opacity="0.6"/>
-        <line x1="58" y1="48" x2="50" y2="58" stroke="url(#lineGrad4)" stroke-width="1" opacity="0.6"/>
-        <defs>
-          <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#8b5cf6"/>
-            <stop offset="50%" stop-color="#06b6d4"/>
-            <stop offset="100%" stop-color="#10b981"/>
-          </linearGradient>
-          <radialGradient id="innerGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.5"/>
-            <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
-          </radialGradient>
-          <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#8b5cf6"/>
-            <stop offset="100%" stop-color="#06b6d4"/>
-          </linearGradient>
-          <linearGradient id="lineGrad1" x1="50%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#06b6d4"/>
-            <stop offset="100%" stop-color="#8b5cf6"/>
-          </linearGradient>
-          <linearGradient id="lineGrad2" x1="50%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#06b6d4"/>
-            <stop offset="100%" stop-color="#10b981"/>
-          </linearGradient>
-          <linearGradient id="lineGrad3" x1="0%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stop-color="#8b5cf6"/>
-            <stop offset="100%" stop-color="#ff0080"/>
-          </linearGradient>
-          <linearGradient id="lineGrad4" x1="100%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stop-color="#10b981"/>
-            <stop offset="100%" stop-color="#ff0080"/>
-          </linearGradient>
-        </defs>
-      </svg>
+      <div class="ditto-logo-nav">
+        <div class="mind-nav left-nav"></div>
+        <div class="mind-nav right-nav"></div>
+      </div>
       <span class="logo-text">Ditto.</span>
     </a>
     <div class="nav-links">
-      <button onclick="showToast('Sign In coming soon!')">Sign In</button>
-      <button onclick="showToast('Create Mind coming soon!')">Create Mind</button>
+      <button onclick="window.location.href='login.html'">Sign In</button>
+      <button onclick="window.location.href='login.html'">Login</button>
     </div>
   </nav>
 
   <!-- HERO -->
   <main class="hero-section">
-    <h1>Ever felt the world doesn't <span>understand you...</span></h1>
-    <p class="hero-subtitle">Connect with like-minded people. Where minds meet before appearances. No photos. No followers. Just thoughts.</p>
-
-    <button class="btn" onclick="showToast('Find My Ditto coming soon!')">Find my Ditto &#10024;</button>
-
-    <!-- Preview Card -->
-    <div class="preview-container">
-      <div class="glass-card">
-        <span class="card-badge">96% Mind Match</span>
-        <div style="font-size: 38px; margin-bottom: 8px;">&#129504;</div>
-        <h3 style="font-size: 18px; margin-bottom: 4px; font-weight: 600;">The Thinker</h3>
-        <p style="font-size: 14px; margin: 4px 0 14px 0; color: #cbd5e1; line-height: 1.5;">"Ideas build the future. Seeking meaningful conversations and discovering shared core values."</p>
-        <div>
-          <span class="card-tag">#Philosophy</span>
-          <span class="card-tag">#AI</span>
-          <span class="card-tag">#Future</span>
-        </div>
-      </div>
+    <div class="ditto-logo-hero">
+      <div class="mind-hero left-hero"></div>
+      <div class="mind-hero right-hero"></div>
     </div>
+    <h1>Ever felt the world doesn't <span>understand you?</span></h1>
+    <p class="hero-subtitle">Welcome to Ditto. Connect with like minded people, and never get judegd.</p>
+    <button class="btn" onclick="window.location.href='login.html'">Find My Ditto</button>
   </main>
 
-  <!-- THOUGHTS PREVIEW -->
-  <section class="thoughts-preview">
-    <h2>What Minds Are Sharing</h2>
-    <p>Real thoughts from real people. No photos. Just ideas.</p>
+  <!-- ============================================ -->
+  <!-- FLOATING THOUGHTS — CLEAN 2-LAYER MARQUEE   -->
+  <!-- ============================================ -->
+  <section class="thought-marquee">
+    <div class="marquee-title">See What Others <span>Ditt</span></div>
+    <div class="marquee-sub">Say What You Can't Say Anywhere.</div>
 
-    <div class="thoughts-grid">
-      <div class="glass-card thought-card">
-        <div class="thought-header">
-          <div class="thought-avatar">&#127769;</div>
-          <div class="thought-meta">
-            <span class="thought-name">The Dreamer</span>
-            <span class="thought-id">DIT-2847</span>
-          </div>
+    <!-- TOP ROW — moves RIGHT (rightMove) -->
+    <div class="slider">
+      <div class="track rightMove">
+
+        <div class="card">
+          <div class="user">&#129504; d/SDC</div>
+          <div class="text">"Dr. Israr ko sunke har koi apne app ko scholar samajne laga ha."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 96%</div>
         </div>
-        <div class="thought-content">"The most dangerous thing is a closed mind. Stay curious, even when it's uncomfortable."</div>
-        <div class="thought-actions">
-          <button class="thought-action" onclick="toggleReaction(this)">&#128173; Felt This <span>24</span></button>
-          <button class="thought-action" onclick="toggleReaction(this)">&#10024; New Perspective <span>8</span></button>
+
+        <div class="card">
+          <div class="user">&#10084;&#65039; d/QDE</div>
+          <div class="text">"Khud to hazar gunah karte ha aur muje apni galtia ginate ha."</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 91%</div>
         </div>
+
+        <div class="card">
+          <div class="user">&#128064; d/BLG</div>
+          <div class="text">"&#2488;&#2476;&#2494;&#2480; &#2488;&#2494;&#2478;&#2472;&#2503; &#2488;&#2476;&#2494;&#2439; &#2477;&#2494;&#2482;&#2507; &#2478;&#2494;&#2472;&#2497;&#2487;&#2404; &#2438;&#2488;&#2482; &#2458;&#2480;&#2495;&#2468;&#2509;&#2480;&#2463;&#2494; &#2470;&#2503;&#2454;&#2494; &#2527;&#2494;&#2527; &#2479;&#2454;&#2472; &#2453;&#2503;&#2441; &#2470;&#2503;&#2454;&#2458;&#2503; &#2472;&#2494;&#2404;"</div>
+          <div class="trans">Everyone looks like a good person in public. Their real character appears when nobody is watching.</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 94%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128170; d/SPA</div>
+          <div class="text">"Meri puppho iss duniya ki sabse se kamini insan ha."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 93%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128066; d/QPC</div>
+          <div class="text">"Log advice free mein dete hain, support kabhi free mein nahi dete."</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 89%</div>
+        </div>
+
+        <!-- DUPLICATE for seamless loop -->
+        <div class="card">
+          <div class="user">&#129504; d/SDC</div>
+          <div class="text">"Muje ab parne ka man nahi karta, ajj kal nashe bhi karne laga hu."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 96%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#10084;&#65039; d/QDE</div>
+          <div class="text">"Maths teachers ko ubalte lava me fek dena cahiye."</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 91%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128064; d/BLG</div>
+          <div class="text">"&#2488;&#2476;&#2494;&#2480; &#2488;&#2494;&#2478;&#2472;&#2503; &#2488;&#2476;&#2494;&#2439; &#2477;&#2494;&#2482;&#2507; &#2478;&#2494;&#2472;&#2497;&#2487;&#2404; &#2438;&#2488;&#2482; &#2458;&#2480;&#2495;&#2468;&#2509;&#2480;&#2463;&#2494; &#2470;&#2503;&#2454;&#2494; &#2527;&#2494;&#2527; &#2479;&#2454;&#2472; &#2453;&#2503;&#2441; &#2470;&#2503;&#2454;&#2458;&#2503; &#2472;&#2494;&#2404;"</div>
+          <div class="trans">Everyone looks like a good person in public. Their real character appears when nobody is watching.</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 94%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128170; d/SPA</div>
+          <div class="text">"Ye koi naya scholar aya ha market me, mere molle wale use lekin gumrah bolte ha..."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 93%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128066; d/QPC</div>
+          <div class="text">"Log advice free mein dete hain, support kabhi free mein nahi dete."</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 89%</div>
+        </div>
+
       </div>
+    </div>
 
-      <div class="glass-card thought-card">
-        <div class="thought-header">
-          <div class="thought-avatar">&#128293;</div>
-          <div class="thought-meta">
-            <span class="thought-name">The Rebel</span>
-            <span class="thought-id">DIT-9153</span>
-          </div>
+    <!-- BOTTOM ROW — moves LEFT (leftMove) -->
+    <div class="slider">
+      <div class="track leftMove">
+
+        <div class="card">
+          <div class="user">&#128099; d/BLE</div>
+          <div class="text">"The internet made us connected, but somehow lonelier."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 95%</div>
         </div>
-        <div class="thought-content">"We don't need more information. We need people who know how to think about what we have."</div>
-        <div class="thought-actions">
-          <button class="thought-action" onclick="toggleReaction(this)">&#128173; Felt This <span>56</span></button>
-          <button class="thought-action" onclick="toggleReaction(this)">&#10024; New Perspective <span>31</span></button>
+
+        <div class="card">
+          <div class="user">&#129782; d/QDG</div>
+          <div class="text">"&#2477;&#2494;&#2482;&#2507;&#2476;&#2494;&#2488;&#2494; &#2447;&#2454;&#2478; &#2437;&#2472;&#2497;&#2477;&#2498;&#2468;&#2495; &#2472;&#2527;, &#2447;&#2453;&#2463;&#2494; competition &#2489;&#2527;&#2503; &#2470;&#2503;&#2458;&#2503;&#2404;"</div>
+          <div class="trans">Love is no longer a feeling; it has become a competition.</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 90%</div>
         </div>
+
+        <div class="card">
+          <div class="user">&#129309; d/SPC</div>
+          <div class="text">"Respect should be earned, not demanded because of age."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 97%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128068; d/SLA</div>
+          <div class="text">"Sab equality ki baat karte hain, jab tak unka privilege challenge na ho."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 95%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#9995; d/BPG</div>
+          <div class="text">"Some families break your confidence first and then ask why you're so quiet."</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 90%</div>
+        </div>
+
+        <!-- DUPLICATE for seamless loop -->
+        <div class="card">
+          <div class="user">&#128099; d/BLE</div>
+          <div class="text">"The internet made us connected, but somehow lonelier."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 95%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#129782; d/QDG</div>
+          <div class="text">"&#2477;&#2494;&#2482;&#2507;&#2476;&#2494;&#2488;&#2494; &#2447;&#2454;&#2478; &#2437;&#2472;&#2497;&#2477;&#2498;&#2468;&#2495; &#2472;&#2527;, &#2447;&#2453;&#2463;&#2494; competition &#2489;&#2527;&#2503; &#2470;&#2503;&#2458;&#2503;&#2404;"</div>
+          <div class="trans">Love is no longer a feeling; it has become a competition.</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 90%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#129309; d/SPC</div>
+          <div class="text">"Respect should be earned, not demanded because of age."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 97%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#128068; d/SLA</div>
+          <div class="text">"Sab equality ki baat karte hain, jab tak unka privilege challenge na ho."</div>
+          <div class="match match-green">&#128154; True Ditto &bull; 95%</div>
+        </div>
+
+        <div class="card">
+          <div class="user">&#9995; d/BPG</div>
+          <div class="text">"Some families break your confidence first and then ask why you're so quiet."</div>
+          <div class="match match-yellow">&#128155; Strong Ditto &bull; 90%</div>
+        </div>
+
       </div>
+    </div>
 
-      <div class="glass-card thought-card">
-        <div class="thought-header">
-          <div class="thought-avatar">&#127793;</div>
-          <div class="thought-meta">
-            <span class="thought-name">The Helper</span>
-            <span class="thought-id">DIT-6732</span>
-          </div>
-        </div>
-        <div class="thought-content">"Empathy isn't about agreeing. It's about understanding why they see the world differently."</div>
-        <div class="thought-actions">
-          <button class="thought-action" onclick="toggleReaction(this)">&#128173; Felt This <span>89</span></button>
-          <button class="thought-action" onclick="toggleReaction(this)">&#10024; New Perspective <span>45</span></button>
-        </div>
+  </section>
+
+  <!-- WHY DITTO -->
+  <section class="why-ditto">
+    <h2>How Ditto Is Different?</h2>
+    <p class="quote">"Everywhere else you are measured by numbers.<br>Here, you are discovered by thoughts."</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="icon">&#10060;</div>
+        <div class="label label-red">Other Platforms</div>
+        <ul>
+          <li><span class="dot-red">&#8226;</span>Followers decide value</li>
+          <li><span class="dot-red">&#8226;</span>Likes create pressure</li>
+          <li><span class="dot-red">&#8226;</span>Photos come before personality</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <div class="icon">&#10004;</div>
+        <div class="label label-green">Ditto</div>
+        <ul>
+          <li><span class="dot-green">&#8226;</span>Thoughts come first</li>
+          <li><span class="dot-green">&#8226;</span>Personality creates connection</li>
+          <li><span class="dot-green">&#8226;</span>Find people who understand you</li>
+        </ul>
       </div>
     </div>
   </section>
 
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <button class="btn btn-large" onclick="window.location.href='login.html'">I Need My Ditto &#10024;</button>
+  </section>
+
   <!-- FOOTER -->
   <footer>
-    <div class="logo-text">&#9673; Ditto.</div>
-    <p>Where minds meet before appearances.</p>
-    <p style="margin-top: 6px;">&copy; 2026 Ditto. All rights reserved.</p>
+    <div style="max-width: 600px; margin: 0 auto;">
+      <div class="footer-logo">DITTOS.</div>
+      <p class="copy">&copy; 2026 Ditto. All rights reserved.</p>
+      <p> Made With Love By Muhammad Zubair</p>.</p>
+    </div>
   </footer>
 
   <!-- Toast -->
@@ -549,21 +842,6 @@
       t.textContent = msg;
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2500);
-    }
-
-    // Toggle reaction
-    function toggleReaction(btn) {
-      const span = btn.querySelector('span');
-      let count = parseInt(span.textContent);
-      if (btn.classList.contains('active')) {
-        btn.classList.remove('active');
-        span.textContent = count - 1;
-      } else {
-        btn.classList.add('active');
-        span.textContent = count + 1;
-        btn.style.transform = 'scale(1.1)';
-        setTimeout(() => btn.style.transform = 'scale(1)', 150);
-      }
     }
   </script>
 
