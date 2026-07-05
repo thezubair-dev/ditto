@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ditto | Where Minds Meet Before Appearances</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #050510;
+      color: white;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== BACKGROUND ===== */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.35), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.25), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.2), transparent 30%);
+      filter: blur(80px);
+      animation: bgMove 10s infinite alternate ease-in-out;
+    }
+    @keyframes bgMove { 100% { transform: scale(1.08); } }
+
+    .light {
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(50px);
+      pointer-events: none;
+      z-index: -1;
+      will-change: transform;
+    }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 6%;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* DITTO LOGO */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .logo svg {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a855f7, #06b6d4, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+    .nav-links button {
+      padding: 10px 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+    .nav-links button:hover {
+      background: #10b981;
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* ===== HERO ===== */
+    .hero-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 50px 6% 80px;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(32px, 5.5vw, 58px);
+      font-weight: 800;
+      max-width: 800px;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 18px;
+    }
+    h1 span {
+      background: linear-gradient(90deg, #06b6d4, #8b5cf6, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: clamp(15px, 2vw, 18px);
+      color: #94a3b8;
+      max-width: 520px;
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 16px 40px;
+      border-radius: 40px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+    }
+
+    /* ===== PREVIEW CARD ===== */
+    .preview-container {
+      width: 100%;
+      max-width: 480px;
+      margin: 50px auto 0;
+      padding: 0 16px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 28px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      text-align: left;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(139, 92, 246, 0.1);
+      border-color: rgba(139, 92, 246, 0.2);
+    }
+    .card-badge {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid #06b6d4;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #06b6d4;
+      font-weight: 600;
+    }
+    .card-tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+      margin-right: 6px;
+      color: #cbd5e1;
+    }
+
+    /* ===== THOUGHTS PREVIEW (small section) ===== */
+    .thoughts-preview {
+      padding: 40px 6% 60px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .thoughts-preview h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .thoughts-preview > p {
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .thoughts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .thought-card .thought-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .thought-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: rgba(139, 92, 246, 0.2);
+      flex-shrink: 0;
+    }
+    .thought-meta { display: flex; flex-direction: column; }
+    .thought-name { font-weight: 600; font-size: 14px; }
+    .thought-id { font-size: 11px; color: #64748b; }
+    .thought-content {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e8f0;
+      margin-bottom: 12px;
+    }
+    .thought-actions {
+      display: flex;
+      gap: 14px;
+    }
+    .thought-action {
+      font-size: 12px;
+      color: #64748b;
+      cursor: pointer;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: none;
+      background: none;
+      font-family: 'Inter', sans-serif;
+      padding: 0;
+    }
+    .thought-action:hover { color: #a78bfa; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 30px 6%;
+      text-align: center;
+      color: #475569;
+      font-size: 13px;
+    }
+    footer .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(139, 92, 246, 0.95);
+      backdrop-filter: blur(20px);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Inter', sans-serif;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width: 768px) {
+      nav {
+        height: auto;
+        padding: 14px 5%;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .nav-links {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .nav-links button {
+        width: 100%;
+        padding: 10px;
+        font-size: 13px;
+        text-align: center;
+      }
+      .hero-section {
+        padding: 30px 5% 50px;
+      }
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+      .preview-container {
+        margin-top: 35px;
+      }
+      .thoughts-preview {
+        padding: 30px 5% 40px;
+      }
+      .thoughts-grid {
+        grid-template-columns: 1fr;
+      }
+      .light { display: none; }
+      .bg { filter: blur(50px); }
+    }
+
+    @media(max-width: 480px) {
+      h1 {
+        font-size: 28px;
+        letter-spacing: -0.5px;
+      }
+      .hero-subtitle {
+        font-size: 14px;
+      }
+      .glass-card {
+        padding: 22px;
+      }
+      .card-badge {
+        position: static;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+
+  <div class="bg" aria-hidden="true"></div>
+  <div class="light" id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="#" class="logo" onclick="window.scrollTo(0,0); return false;">
+      <!-- DITTO LOGO SVG -->
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="url(#orbitGrad)" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="50" cy="50" r="32" fill="url(#innerGrad)" opacity="0.3"/>
+        <path d="M35 45 C35 35, 42 28, 50 28 C58 28, 65 35, 65 45 C65 50, 62 54, 58 56 L58 62 C58 66, 54 70, 50 70 C46 70, 42 66, 42 62 L42 56 C38 54, 35 50, 35 45Z"
+              fill="url(#brainGrad)" opacity="0.9"/>
+        <circle cx="50" cy="38" r="3" fill="#06b6d4"/>
+        <circle cx="42" cy="48" r="2.5" fill="#8b5cf6"/>
+        <circle cx="58" cy="48" r="2.5" fill="#10b981"/>
+        <circle cx="50" cy="58" r="2" fill="#ff0080"/>
+        <line x1="50" y1="38" x2="42" y2="48" stroke="url(#lineGrad1)" stroke-width="1" opacity="0.6"/>
+        <line x1="50" y1="38" x2="58" y2="48" stroke="url(#lineGrad2)" stroke-width="1" opacity="0.6"/>
+        <line x1="42" y1="48" x2="50" y2="58" stroke="url(#lineGrad3)" stroke-width="1" opacity="0.6"/>
+        <line x1="58" y1="48" x2="50" y2="58" stroke="url(#lineGrad4)" stroke-width="1" opacity="0.6"/>
+        <defs>
+          <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b5cf6"/>
+            <stop offset="50%" stop-color="#06b6d4"/>
+            <stop offset="100%" stop-color="#10b981"/>
+          </linearGradient>
+          <radialGradient id="innerGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b5cf6"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+          <linearGradient id="lineGrad1" x1="50%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#06b6d4"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+          <linearGradient id="lineGrad2" x1="50%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06b6d4"/>
+            <stop offset="100%" stop-color="#10b981"/>
+          </linearGradient>
+          <linearGradient id="lineGrad3" x1="0%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#8b5cf6"/>
+            <stop offset="100%" stop-color="#ff0080"/>
+          </linearGradient>
+          <linearGradient id="lineGrad4" x1="100%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#10b981"/>
+            <stop offset="100%" stop-color="#ff0080"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-text">Ditto.</span>
+    </a>
+    <div class="nav-links">
+      <button onclick="showToast('Sign In coming soon!')">Sign In</button>
+      <button onclick="showToast('Create Mind coming soon!')">Create Mind</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <main class="hero-section">
+    <h1>Ever felt the world doesn't <span>understand you...</span></h1>
+    <p class="hero-subtitle">Connect with like-minded people. Where minds meet before appearances. No photos. No followers. Just thoughts.</p>
+
+    <button class="btn" onclick="showToast('Find My Ditto coming soon!')">Find my Ditto &#10024;</button>
+
+    <!-- Preview Card -->
+    <div class="preview-container">
+      <div class="glass-card">
+        <span class="card-badge">96% Mind Match</span>
+        <div style="font-size: 38px; margin-bottom: 8px;">&#129504;</div>
+        <h3 style="font-size: 18px; margin-bottom: 4px; font-weight: 600;">The Thinker</h3>
+        <p style="font-size: 14px; margin: 4px 0 14px 0; color: #cbd5e1; line-height: 1.5;">"Ideas build the future. Seeking meaningful conversations and discovering shared core values."</p>
+        <div>
+          <span class="card-tag">#Philosophy</span>
+          <span class="card-tag">#AI</span>
+          <span class="card-tag">#Future</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- THOUGHTS PREVIEW -->
+  <section class="thoughts-preview">
+    <h2>What Minds Are Sharing</h2>
+    <p>Real thoughts from real people. No photos. Just ideas.</p>
+
+    <div class="thoughts-grid">
+      <div class="glass-card thought-card">
+        <div class="thought-header">
+          <div class="thought-avatar">&#127769;</div>
+          <div class="thought-meta">
+            <span class="thought-name">The Dreamer</span>
+            <span class="thought-id">DIT-2847</span>
+          </div>
+        </div>
+        <div class="thought-content">"The most dangerous thing is a closed mind. Stay curious, even when it's uncomfortable."</div>
+        <div class="thought-actions">
+          <button class="thought-action" onclick="toggleReaction(this)">&#128173; Felt This <span>24</span></button>
+          <button class="thought-action" onclick="toggleReaction(this)">&#10024; New Perspective <span>8</span></button>
+        </div>
+      </div>
+
+      <div class="glass-card thought-card">
+        <div class="thought-header">
+          <div class="thought-avatar">&#128293;</div>
+          <div class="thought-meta">
+            <span class="thought-name">The Rebel</span>
+            <span class="thought-id">DIT-9153</span>
+          </div>
+        </div>
+        <div class="thought-content">"We don't need more information. We need people who know how to think about what we have."</div>
+        <div class="thought-actions">
+          <button class="thought-action" onclick="toggleReaction(this)">&#128173; Felt This <span>56</span></button>
+          <button class="thought-action" onclick="toggleReaction(this)">&#10024; New Perspective <span>31</span></button>
+        </div>
+      </div>
+
+      <div class="glass-card thought-card">
+        <div class="thought-header">
+          <div class="thought-avatar">&#127793;</div>
+          <div class="thought-meta">
+            <span class="thought-name">The Helper</span>
+            <span class="thought-id">DIT-6732</span>
+          </div>
+        </div>
+        <div class="thought-content">"Empathy isn't about agreeing. It's about understanding why they see the world differently."</div>
+        <div class="thought-actions">
+          <button class="thought-action" onclick="toggleReaction(this)">&#128173; Felt This <span>89</span></button>
+          <button class="thought-action" onclick="toggleReaction(this)">&#10024; New Perspective <span>45</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo-text">&#9673; Ditto.</div>
+    <p>Where minds meet before appearances.</p>
+    <p style="margin-top: 6px;">&copy; 2026 Ditto. All rights reserved.</p>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // Cursor glow
+    const glow = document.getElementById("cursor-glow");
+    if (window.matchMedia("(pointer:fine)").matches) {
+      window.addEventListener("mousemove", (e) => {
+        glow.style.transform = `translate3d(${e.clientX - 140}px, ${e.clientY - 140}px, 0)`;
+      });
+    }
+
+    // Toast
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // Toggle reaction
+    function toggleReaction(btn) {
+      const span = btn.querySelector('span');
+      let count = parseInt(span.textContent);
+      if (btn.classList.contains('active')) {
+        btn.classList.remove('active');
+        span.textContent = count - 1;
+      } else {
+        btn.classList.add('active');
+        span.textContent = count + 1;
+        btn.style.transform = 'scale(1.1)';
+        setTimeout(() => btn.style.transform = 'scale(1)', 150);
+      }
+    }
+  </script>
+
+</body>
+</html>
