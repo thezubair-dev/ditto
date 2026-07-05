@@ -73,7 +73,6 @@
       color: #64748b; font-size: 14px; margin-top: 16px;
     }
 
-    /* Match Card */
     .match-card {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -168,7 +167,6 @@
     }
     .btn-skip:hover { background: rgba(255,255,255,0.1); color: white; }
 
-    /* My Dittos List */
     .my-dittos-section {
       padding: 0 6%; max-width: 600px; margin: 0 auto;
     }
@@ -206,7 +204,6 @@
       border-radius: 20px;
     }
 
-    /* Chat Modal */
     .chat-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.8);
       backdrop-filter: blur(10px); z-index: 3000;
@@ -263,7 +260,6 @@
       cursor: pointer;
     }
 
-    /* Bottom Nav */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: 64px; background: rgba(5, 5, 16, 0.85);
@@ -297,6 +293,16 @@
     .toast.error { background: rgba(239, 68, 68, 0.95); }
     .toast.success { background: rgba(16, 185, 129, 0.95); }
 
+    .loading-matches {
+      text-align: center; padding: 40px; color: #64748b;
+    }
+    .loading-matches .spinner {
+      width: 32px; height: 32px; border: 2px solid rgba(139,92,246,0.2);
+      border-top-color: #8b5cf6; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     @media(max-width: 480px) {
       .page-title { font-size: 22px; }
       .find-btn { padding: 16px 40px; font-size: 16px; }
@@ -327,7 +333,6 @@
     <div class="find-subtitle" id="findSubtitle">You can find 2 dittos per day</div>
   </div>
 
-  <!-- Match Result Card -->
   <div class="match-card" id="matchCard">
     <div class="match-avatar" id="matchAvatar">&#129504;</div>
     <div class="match-name" id="matchName">Name</div>
@@ -341,13 +346,11 @@
     </div>
   </div>
 
-  <!-- My Dittos -->
   <div class="my-dittos-section" id="myDittosSection" style="display:none;">
     <div class="section-header">Your Dittos</div>
     <div class="dittos-list" id="dittosList"></div>
   </div>
 
-  <!-- Chat Modal -->
   <div class="chat-overlay" id="chatOverlay">
     <div class="chat-container">
       <div class="chat-header">
@@ -362,8 +365,8 @@
     </div>
   </div>
 
-  <!-- Bottom Nav -->
   <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="icon">&#127968;</span>Home</a>
     <a href="ditts.html" class="nav-item"><span class="icon">&#128172;</span>Ditts</a>
     <a href="dittos.html" class="nav-item active"><span class="icon">&#129309;</span>Dittos</a>
     <a href="profile.html" class="nav-item"><span class="icon">&#128100;</span>Profile</a>
@@ -374,7 +377,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, addDoc, updateDoc, onSnapshot, orderBy, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, addDoc, updateDoc, onSnapshot, orderBy, serverTimestamp, setDoc, enableNetwork } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
@@ -390,23 +393,29 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    try { await enableNetwork(db); } catch(e) {}
+
     let currentUser = null;
     let myData = null;
     let currentMatch = null;
     let dailyUsed = 0;
     const MAX_DAILY = 2;
-    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;' };
+    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;', '7': '&#129782;', '8': '&#129309;', '9': '&#128068;', '10': '&#9995;' };
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = 'login.html'; return; }
       currentUser = user;
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists() || !userDoc.data().profileComplete) {
-        window.location.href = 'quiz.html'; return;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists() || !userDoc.data().profileComplete) {
+          window.location.href = 'quiz.html'; return;
+        }
+        myData = userDoc.data();
+        checkDailyLimit();
+        loadMyDittos();
+      } catch (err) {
+        showToast('Error loading: ' + err.message, 'error');
       }
-      myData = userDoc.data();
-      checkDailyLimit();
-      loadMyDittos();
     });
 
     function checkDailyLimit() {
@@ -420,7 +429,6 @@
       } else {
         dailyUsed = myData.dailyMatchesUsed || 0;
       }
-
       updateLimitUI();
     }
 
@@ -440,12 +448,12 @@
       }
     }
 
-    // Matching logic
     function tierOf(a, b) {
+      if (!a || !b) return { tier: 'No Ditto', n: 0, driveMatch: false };
       const dims = ['energy', 'heart', 'drive'];
-      const matches = dims.filter(d => a[d] === b[d]);
+      const matches = dims.filter(d => a[d] && b[d] && a[d] === b[d]);
       const n = matches.length;
-      const driveMatch = a.drive === b.drive;
+      const driveMatch = a.drive && b.drive && a.drive === b.drive;
       if (!driveMatch) return { tier: 'No Ditto', n, driveMatch };
       if (n === 3) return { tier: 'True Ditto', n, driveMatch };
       if (n === 2) return { tier: 'Strong Ditto', n, driveMatch };
@@ -455,13 +463,12 @@
 
     window.findDitto = async function() {
       if (dailyUsed >= MAX_DAILY) { showToast('Daily limit reached!', 'error'); return; }
-      if (!myData) return;
+      if (!myData) { showToast('Loading... please wait', 'error'); return; }
 
       const btn = document.getElementById('findBtn');
       btn.disabled = true; btn.textContent = 'Searching...';
 
       try {
-        // Get all users except self
         const allUsersSnap = await getDocs(collection(db, 'users'));
         const candidates = [];
         allUsersSnap.forEach(docSnap => {
@@ -480,19 +487,14 @@
           return;
         }
 
-        // Sort by tier quality
         const tierOrder = { 'True Ditto': 3, 'Strong Ditto': 2, 'Ditto': 1 };
         candidates.sort((a, b) => tierOrder[b.tier.tier] - tierOrder[a.tier.tier]);
-
-        // Pick random from top tier
         const topTier = candidates[0].tier.tier;
         const topCandidates = candidates.filter(c => c.tier.tier === topTier);
         currentMatch = topCandidates[Math.floor(Math.random() * topCandidates.length)];
 
-        // Show match card
         showMatchCard(currentMatch);
 
-        // Save match
         await setDoc(doc(db, 'matches', `${currentUser.uid}_${currentMatch.uid}`), {
           user1: currentUser.uid,
           user2: currentMatch.uid,
@@ -500,13 +502,14 @@
           createdAt: serverTimestamp()
         });
 
-        // Increment daily count
         dailyUsed++;
-        await updateDoc(doc(db, 'users', currentUser.uid), { dailyMatchesUsed: dailyUsed });
+        await updateDoc(doc(db, 'users', currentUser.uid), { dailyMatchesUsed: dailyUsed, dittosCount: (myData.dittosCount || 0) + 1 });
+        myData.dittosCount = (myData.dittosCount || 0) + 1;
         updateLimitUI();
 
       } catch (err) {
-        showToast('Error: ' + err.message, 'error');
+        console.error("Find error:", err);
+        showToast('Error finding match: ' + err.message, 'error');
         btn.disabled = false; btn.textContent = 'Find My Ditto';
       }
     };
@@ -540,7 +543,6 @@
       currentMatch = null;
     };
 
-    // Chat
     window.openChat = function() {
       if (!currentMatch) return;
       document.getElementById('chatOverlay').classList.add('show');
@@ -567,64 +569,72 @@
           container.appendChild(div);
         });
         container.scrollTop = container.scrollHeight;
+      }, (err) => {
+        console.error("Chat error:", err);
       });
     }
 
     window.sendMessage = async function() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
-      if (!text || !currentMatch) return;
+      if (!text || !currentMatch || !myData) return;
 
       const chatId = [currentUser.uid, currentMatch.uid].sort().join('_');
-      await addDoc(collection(db, 'chats', chatId, 'messages'), {
-        senderId: currentUser.uid,
-        senderName: myData.displayName || 'Ditto User',
-        text: text,
-        createdAt: serverTimestamp()
-      });
-      input.value = '';
+      try {
+        await addDoc(collection(db, 'chats', chatId, 'messages'), {
+          senderId: currentUser.uid,
+          senderName: myData.displayName || 'Ditto User',
+          text: text,
+          createdAt: serverTimestamp()
+        });
+        input.value = '';
+      } catch (err) {
+        showToast('Failed to send message', 'error');
+      }
     };
 
-    // Load my dittos
     async function loadMyDittos() {
-      const q = query(collection(db, 'matches'), where('user1', '==', currentUser.uid));
-      const q2 = query(collection(db, 'matches'), where('user2', '==', currentUser.uid));
-      const [snap1, snap2] = await Promise.all([getDocs(q), getDocs(q2)]);
+      try {
+        const q = query(collection(db, 'matches'), where('user1', '==', currentUser.uid));
+        const q2 = query(collection(db, 'matches'), where('user2', '==', currentUser.uid));
+        const [snap1, snap2] = await Promise.all([getDocs(q), getDocs(q2)]);
 
-      const matches = [];
-      snap1.forEach(d => matches.push(d.data()));
-      snap2.forEach(d => matches.push(d.data()));
+        const matches = [];
+        snap1.forEach(d => matches.push(d.data()));
+        snap2.forEach(d => matches.push(d.data()));
 
-      if (matches.length === 0) return;
+        if (matches.length === 0) return;
 
-      document.getElementById('myDittosSection').style.display = 'block';
-      const list = document.getElementById('dittosList');
-      list.innerHTML = '';
+        document.getElementById('myDittosSection').style.display = 'block';
+        const list = document.getElementById('dittosList');
+        list.innerHTML = '';
 
-      for (const m of matches) {
-        const otherId = m.user1 === currentUser.uid ? m.user2 : m.user1;
-        const otherDoc = await getDoc(doc(db, 'users', otherId));
-        if (!otherDoc.exists()) continue;
-        const other = otherDoc.data();
+        for (const m of matches) {
+          const otherId = m.user1 === currentUser.uid ? m.user2 : m.user1;
+          const otherDoc = await getDoc(doc(db, 'users', otherId));
+          if (!otherDoc.exists()) continue;
+          const other = otherDoc.data();
 
-        const tierClass = m.tier === 'True Ditto' ? 'tier-true' : m.tier === 'Strong Ditto' ? 'tier-strong' : 'tier-ditto';
-        const tierColor = m.tier === 'True Ditto' ? '#34d399' : m.tier === 'Strong Ditto' ? '#fbbf24' : '#a78bfa';
+          const tierClass = m.tier === 'True Ditto' ? 'tier-true' : m.tier === 'Strong Ditto' ? 'tier-strong' : 'tier-ditto';
 
-        const item = document.createElement('div');
-        item.className = 'dittos-item';
-        item.innerHTML = `
-          <div class="dittos-avatar">${avatars[other.avatar] || '&#129504;'}</div>
-          <div class="dittos-info">
-            <div class="dittos-name">${other.displayName || 'Ditto User'}</div>
-            <div class="dittos-id">${other.dittoidCode || 'd/---'}</div>
-          </div>
-          <div class="dittos-tier ${tierClass}">${m.tier}</div>
-        `;
-        item.onclick = () => {
-          currentMatch = other;
-          openChat();
-        };
-        list.appendChild(item);
+          const item = document.createElement('div');
+          item.className = 'dittos-item';
+          item.innerHTML = `
+            <div class="dittos-avatar">${avatars[other.avatar] || '&#129504;'}</div>
+            <div class="dittos-info">
+              <div class="dittos-name">${other.displayName || 'Ditto User'}</div>
+              <div class="dittos-id">${other.dittoidCode || 'd/---'}</div>
+            </div>
+            <div class="dittos-tier ${tierClass}">${m.tier}</div>
+          `;
+          item.onclick = () => {
+            currentMatch = other;
+            openChat();
+          };
+          list.appendChild(item);
+        }
+      } catch (err) {
+        console.error("Load dittos error:", err);
       }
     }
 
