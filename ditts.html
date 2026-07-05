@@ -33,7 +33,6 @@
     }
     .page-subtitle { color: #64748b; font-size: 14px; }
 
-    /* FAB - Create Ditt */
     .fab {
       position: fixed; bottom: 84px; right: 20px;
       width: 56px; height: 56px; border-radius: 50%;
@@ -46,7 +45,6 @@
     }
     .fab:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(139, 92, 246, 0.6); }
 
-    /* Create Modal */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.7);
       backdrop-filter: blur(8px); z-index: 2000;
@@ -93,7 +91,6 @@
     .btn-post:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
     .btn-post:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* Feed */
     .feed-container {
       max-width: 600px; margin: 0 auto; padding: 0 6%;
     }
@@ -138,7 +135,6 @@
     .ditt-action:hover { color: #a78bfa; }
     .ditt-action.active { color: #a78bfa; }
 
-    /* Match badge */
     .match-badge {
       display: inline-flex; align-items: center; gap: 4px;
       padding: 4px 10px; border-radius: 20px;
@@ -149,7 +145,6 @@
     .match-ditto { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
     .match-none { background: rgba(100,116,139,0.1); color: #64748b; border: 1px solid rgba(100,116,139,0.2); }
 
-    /* Comments section */
     .comments-section {
       display: none; margin-top: 14px; padding-top: 14px;
       border-top: 1px solid rgba(255,255,255,0.04);
@@ -187,7 +182,6 @@
     .comment-name { font-size: 12px; font-weight: 600; color: #a78bfa; }
     .comment-text { font-size: 13px; color: #cbd5e1; line-height: 1.4; margin-top: 2px; }
 
-    /* Bottom Nav */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: 64px; background: rgba(5, 5, 16, 0.85);
@@ -212,6 +206,16 @@
     .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
     .empty-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: #94a3b8; margin-bottom: 8px; }
     .empty-state p { font-size: 14px; }
+
+    .loading-feed {
+      text-align: center; padding: 40px; color: #64748b;
+    }
+    .loading-feed .spinner {
+      width: 32px; height: 32px; border: 2px solid rgba(139,92,246,0.2);
+      border-top-color: #8b5cf6; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .toast {
       position: fixed; bottom: 80px; left: 50%;
@@ -246,17 +250,14 @@
   </div>
 
   <div class="feed-container" id="feedContainer">
-    <div class="empty-state" id="emptyState">
-      <div class="icon">&#128172;</div>
-      <h3>No ditts yet</h3>
-      <p>Be the first to share your thoughts!</p>
+    <div class="loading-feed" id="loadingFeed">
+      <div class="spinner"></div>
+      <div>Loading ditts...</div>
     </div>
   </div>
 
-  <!-- FAB -->
   <button class="fab" id="fabBtn" onclick="openModal()">&#43;</button>
 
-  <!-- Create Modal -->
   <div class="modal-overlay" id="createModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -268,8 +269,8 @@
     </div>
   </div>
 
-  <!-- Bottom Nav -->
   <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="icon">&#127968;</span>Home</a>
     <a href="ditts.html" class="nav-item active"><span class="icon">&#128172;</span>Ditts</a>
     <a href="dittos.html" class="nav-item"><span class="icon">&#129309;</span>Dittos</a>
     <a href="profile.html" class="nav-item"><span class="icon">&#128100;</span>Profile</a>
@@ -280,7 +281,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, updateDoc, arrayUnion, arrayRemove, serverTimestamp, enableNetwork, disableNetwork } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
@@ -296,23 +297,32 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let currentUser = null;
-    let myDittoid = null;
-    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;' };
+    // Enable offline persistence
+    try {
+      await enableNetwork(db);
+    } catch(e) { console.log("Network enable:", e); }
 
-    // Auth check + load profile
+    let currentUser = null;
+    let myData = null;
+    let myDittoid = null;
+    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;', '7': '&#129782;', '8': '&#129309;', '9': '&#128068;', '10': '&#9995;' };
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = 'login.html'; return; }
       currentUser = user;
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists() || !userDoc.data().profileComplete) {
-        window.location.href = 'quiz.html'; return;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists() || !userDoc.data().profileComplete) {
+          window.location.href = 'quiz.html'; return;
+        }
+        myData = userDoc.data();
+        myDittoid = myData.dittoid || {};
+        loadFeed();
+      } catch (err) {
+        showToast('Error loading profile: ' + err.message, 'error');
       }
-      myDittoid = userDoc.data().dittoid;
-      loadFeed();
     });
 
-    // Real-time feed
     function loadFeed() {
       const q = query(collection(db, 'ditts'), orderBy('createdAt', 'desc'));
       onSnapshot(q, (snapshot) => {
@@ -326,7 +336,6 @@
             </div>`;
           return;
         }
-
         container.innerHTML = '';
         snapshot.forEach((docSnap) => {
           const ditt = docSnap.data();
@@ -334,6 +343,14 @@
           const card = createDittCard(ditt, dittId);
           container.appendChild(card);
         });
+      }, (err) => {
+        console.error("Feed error:", err);
+        document.getElementById('feedContainer').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">&#9888;</div>
+            <h3>Connection issue</h3>
+            <p>Please check your internet and refresh.</p>
+          </div>`;
       });
     }
 
@@ -341,9 +358,8 @@
       const div = document.createElement('div');
       div.className = 'ditt-card';
 
-      // Calculate match tier
       let matchHtml = '';
-      if (myDittoid && ditt.authorDittoid) {
+      if (myDittoid && ditt.authorDittoid && Object.keys(myDittoid).length > 0) {
         const tier = tierOf(myDittoid, ditt.authorDittoid);
         const tierClass = tier.tier === 'True Ditto' ? 'match-true' :
                           tier.tier === 'Strong Ditto' ? 'match-strong' :
@@ -351,10 +367,10 @@
         const emoji = tier.tier === 'True Ditto' ? '&#128154;' :
                       tier.tier === 'Strong Ditto' ? '&#128155;' :
                       tier.tier === 'Ditto' ? '&#128156;' : '';
-        matchHtml = `<span class="match-badge ${tierClass}">${emoji} ${tier.tier} &bull; ${tier.n}/3</span>`;
+        matchHtml = `<span class="match-badge ${tierClass}">${emoji} ${tier.tier}</span>`;
       }
 
-      const timeAgo = ditt.createdAt ? timeSince(ditt.createdAt.toDate()) : 'Just now';
+      const timeAgo = ditt.createdAt ? timeSince(ditt.createdAt.toDate ? ditt.createdAt.toDate() : new Date(ditt.createdAt)) : 'Just now';
       const liked = ditt.likes && ditt.likes.includes(currentUser.uid);
       const likeClass = liked ? 'active' : '';
       const likeCount = ditt.likes ? ditt.likes.length : 0;
@@ -392,12 +408,12 @@
       return div;
     }
 
-    // Matching logic
     function tierOf(a, b) {
+      if (!a || !b) return { tier: 'No Ditto', n: 0, driveMatch: false };
       const dims = ['energy', 'heart', 'drive'];
-      const matches = dims.filter(d => a[d] === b[d]);
+      const matches = dims.filter(d => a[d] && b[d] && a[d] === b[d]);
       const n = matches.length;
-      const driveMatch = a.drive === b.drive;
+      const driveMatch = a.drive && b.drive && a.drive === b.drive;
       if (!driveMatch) return { tier: 'No Ditto', n, driveMatch };
       if (n === 3) return { tier: 'True Ditto', n, driveMatch };
       if (n === 2) return { tier: 'Strong Ditto', n, driveMatch };
@@ -417,29 +433,33 @@
     window.postDitt = async function() {
       const text = document.getElementById('dittText').value.trim();
       if (!text) { showToast('Write something first!', 'error'); return; }
-      if (!currentUser) return;
+      if (!currentUser || !myData) { showToast('Not ready yet. Please wait...', 'error'); return; }
 
       const btn = document.getElementById('postBtn');
       btn.disabled = true; btn.textContent = 'Posting...';
 
       try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const data = userDoc.data();
         await addDoc(collection(db, 'ditts'), {
           text: text,
           authorId: currentUser.uid,
-          authorName: data.displayName || 'Ditto User',
-          authorDittoid: data.dittoid || {},
-          authorDittoidCode: data.dittoidCode || 'd/---',
-          authorAvatar: data.avatar || '1',
+          authorName: myData.displayName || 'Ditto User',
+          authorDittoid: myData.dittoid || {},
+          authorDittoidCode: myData.dittoidCode || 'd/---',
+          authorAvatar: myData.avatar || '1',
           likes: [],
           comments: [],
           createdAt: serverTimestamp()
         });
+        // Update user's ditts count
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          dittsCount: (myData.dittsCount || 0) + 1
+        });
+        myData.dittsCount = (myData.dittsCount || 0) + 1;
         closeModal();
         showToast('Ditt posted!', 'success');
       } catch (err) {
-        showToast('Error: ' + err.message, 'error');
+        console.error("Post error:", err);
+        showToast('Failed to post. Please check your connection and try again.', 'error');
       } finally {
         btn.disabled = false; btn.textContent = 'Post Ditt';
       }
@@ -447,74 +467,83 @@
 
     window.toggleLike = async function(dittId, el) {
       if (!currentUser) return;
-      const dittRef = doc(db, 'ditts', dittId);
-      const dittSnap = await getDoc(dittRef);
-      if (!dittSnap.exists()) return;
-      const likes = dittSnap.data().likes || [];
-      const liked = likes.includes(currentUser.uid);
+      try {
+        const dittRef = doc(db, 'ditts', dittId);
+        const dittSnap = await getDoc(dittRef);
+        if (!dittSnap.exists()) return;
+        const likes = dittSnap.data().likes || [];
+        const liked = likes.includes(currentUser.uid);
 
-      if (liked) {
-        await updateDoc(dittRef, { likes: arrayRemove(currentUser.uid) });
-        el.classList.remove('active');
-        el.querySelector('span:first-child').innerHTML = '&#129293;';
-      } else {
-        await updateDoc(dittRef, { likes: arrayUnion(currentUser.uid) });
-        el.classList.add('active');
-        el.querySelector('span:first-child').innerHTML = '&#10084;&#65039;';
+        if (liked) {
+          await updateDoc(dittRef, { likes: arrayRemove(currentUser.uid) });
+          el.classList.remove('active');
+          el.querySelector('span:first-child').innerHTML = '&#129293;';
+        } else {
+          await updateDoc(dittRef, { likes: arrayUnion(currentUser.uid) });
+          el.classList.add('active');
+          el.querySelector('span:first-child').innerHTML = '&#10084;&#65039;';
+        }
+      } catch (err) {
+        showToast('Error updating like', 'error');
       }
     };
 
     window.toggleComments = async function(dittId, el) {
       const section = document.getElementById('comments-' + dittId);
       const isOpen = section.classList.contains('show');
-      if (isOpen) {
-        section.classList.remove('show');
-        return;
-      }
+      if (isOpen) { section.classList.remove('show'); return; }
       section.classList.add('show');
-
-      // Load comments
-      const dittRef = doc(db, 'ditts', dittId);
-      const dittSnap = await getDoc(dittRef);
-      const comments = dittSnap.data().comments || [];
-      const list = document.getElementById('commentsList-' + dittId);
-      if (comments.length === 0) {
-        list.innerHTML = '<div style="color:#475569;font-size:13px;padding:8px 0;">No comments yet. Be the first!</div>';
-      } else {
-        list.innerHTML = comments.map(c => `
-          <div class="comment">
-            <div class="comment-avatar">${avatars[c.authorAvatar] || '&#129504;'}</div>
-            <div class="comment-body">
-              <div class="comment-name">${escapeHtml(c.authorName)}</div>
-              <div class="comment-text">${escapeHtml(c.text)}</div>
-            </div>
-          </div>
-        `).join('');
-      }
+      loadComments(dittId);
     };
+
+    async function loadComments(dittId) {
+      try {
+        const dittRef = doc(db, 'ditts', dittId);
+        const dittSnap = await getDoc(dittRef);
+        const comments = dittSnap.data().comments || [];
+        const list = document.getElementById('commentsList-' + dittId);
+        if (comments.length === 0) {
+          list.innerHTML = '<div style="color:#475569;font-size:13px;padding:8px 0;">No comments yet. Be the first!</div>';
+        } else {
+          list.innerHTML = comments.map(c => `
+            <div class="comment">
+              <div class="comment-avatar">${avatars[c.authorAvatar] || '&#129504;'}</div>
+              <div class="comment-body">
+                <div class="comment-name">${escapeHtml(c.authorName)}</div>
+                <div class="comment-text">${escapeHtml(c.text)}</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error("Comments error:", err);
+      }
+    }
 
     window.postComment = async function(dittId) {
       const input = document.getElementById('commentInput-' + dittId);
       const text = input.value.trim();
-      if (!text) return;
-      if (!currentUser) return;
+      if (!text || !currentUser || !myData) return;
 
-      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-      const data = userDoc.data();
       const comment = {
         authorId: currentUser.uid,
-        authorName: data.displayName || 'Ditto User',
-        authorAvatar: data.avatar || '1',
+        authorName: myData.displayName || 'Ditto User',
+        authorAvatar: myData.avatar || '1',
         text: text,
         createdAt: new Date().toISOString()
       };
 
-      await updateDoc(doc(db, 'ditts', dittId), { comments: arrayUnion(comment) });
-      input.value = '';
-      toggleComments(dittId, null); // refresh
+      try {
+        await updateDoc(doc(db, 'ditts', dittId), { comments: arrayUnion(comment) });
+        input.value = '';
+        loadComments(dittId);
+      } catch (err) {
+        showToast('Failed to post comment', 'error');
+      }
     };
 
     function timeSince(date) {
+      if (!date || isNaN(date.getTime())) return 'Just now';
       const seconds = Math.floor((new Date() - date) / 1000);
       if (seconds < 60) return 'Just now';
       const minutes = Math.floor(seconds / 60);
