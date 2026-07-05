@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ditto | Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #050510;
+      color: white;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== BACKGROUND ===== */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.35), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.25), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.2), transparent 30%);
+      filter: blur(80px);
+      animation: bgMove 10s infinite alternate ease-in-out;
+    }
+    @keyframes bgMove { 100% { transform: scale(1.08); } }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 6%;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a855f7, #06b6d4, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ditto-logo-nav {
+      width: 38px;
+      height: 38px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .mind-nav {
+      width: 13px;
+      height: 18px;
+      position: absolute;
+      top: 8px;
+      border-radius: 60% 60% 35% 60%;
+    }
+    .left-nav {
+      left: 4px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      transform: rotate(-35deg);
+    }
+    .right-nav {
+      right: 4px;
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+      transform: rotate(145deg);
+    }
+
+    .back-btn {
+      padding: 10px 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:hover {
+      background: #10b981;
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* ===== LOGIN CARD ===== */
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      margin-top: 80px;
+      margin-bottom: 40px;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 28px;
+      padding: 40px 36px;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 0 80px rgba(139, 92, 246, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.04), transparent 60%);
+      pointer-events: none;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .login-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .login-header p {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    /* ===== FORM ===== */
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .form-group input::placeholder {
+      color: #64748b;
+    }
+    .form-group input:focus {
+      border-color: rgba(139, 92, 246, 0.5);
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.1) inset;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      border-radius: 40px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      color: #64748b;
+      font-size: 13px;
+      position: relative;
+      z-index: 1;
+    }
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .google-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .google-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .google-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .toggle-text {
+      text-align: center;
+      margin-top: 24px;
+      color: #94a3b8;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    .toggle-text a {
+      color: #a78bfa;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .toggle-text a:hover {
+      color: #c4b5fd;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(139, 92, 246, 0.95);
+      backdrop-filter: blur(20px);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Inter', sans-serif;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: rgba(239, 68, 68, 0.95); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.4); }
+    .toast.success { background: rgba(16, 185, 129, 0.95); box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4); }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width: 480px) {
+      .login-card {
+        padding: 32px 24px;
+        border-radius: 22px;
+      }
+      .login-header h2 {
+        font-size: 26px;
+      }
+      nav {
+        padding: 14px 5%;
+      }
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+
+  <div class="bg" aria-hidden="true"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="logo">
+      <div class="ditto-logo-nav">
+        <div class="mind-nav left-nav"></div>
+        <div class="mind-nav right-nav"></div>
+      </div>
+      <span class="logo-text">Ditto.</span>
+    </a>
+    <a href="index.html" class="back-btn">&#8592; Back to Home</a>
+  </nav>
+
+  <!-- LOGIN / SIGNUP CARD -->
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h2 id="formTitle">Welcome Back</h2>
+        <p id="formSubtitle">Sign in to continue your journey</p>
+      </div>
+
+      <form id="authForm" onsubmit="return false;">
+        <!-- Name field (only for signup) -->
+        <div class="form-group" id="nameGroup" style="display:none;">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name" autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required minlength="6">
+        </div>
+
+        <!-- Confirm Password (only for signup) -->
+        <div class="form-group" id="confirmGroup" style="display:none;">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Sign In</button>
+      </form>
+
+      <div class="divider">or</div>
+
+      <button class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+          <path fill="#4285F4" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#34A853" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="toggle-text">
+        <span id="toggleQuestion">Don't have an account?</span>
+        <a id="toggleLink" onclick="toggleMode()">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ===== FIREBASE SDK ===== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
+      authDomain: "dittoweb.firebaseapp.com",
+      projectId: "dittoweb",
+      storageBucket: "dittoweb.firebasestorage.app",
+      messagingSenderId: "902164300349",
+      appId: "1:902164300349:web:307e58ba6e3e9dbc33a054",
+      measurementId: "G-JP34BSJ3RB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Check if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        showToast('Welcome back, ' + (user.displayName || user.email) + '!', 'success');
+        setTimeout(() => {
+          // window.location.href = 'dashboard.html'; // Uncomment when dashboard is ready
+        }, 1500);
+      }
+    });
+
+    // Form handling
+    let isSignUp = false;
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const nameGroup = document.getElementById('nameGroup');
+    const confirmGroup = document.getElementById('confirmGroup');
+    const toggleQuestion = document.getElementById('toggleQuestion');
+    const toggleLink = document.getElementById('toggleLink');
+    const authForm = document.getElementById('authForm');
+    const googleBtn = document.getElementById('googleBtn');
+
+    window.toggleMode = function() {
+      isSignUp = !isSignUp;
+      if (isSignUp) {
+        formTitle.textContent = 'Create Account';
+        formSubtitle.textContent = 'Join Ditto and find your people';
+        submitBtn.textContent = 'Sign Up';
+        nameGroup.style.display = 'block';
+        confirmGroup.style.display = 'block';
+        toggleQuestion.textContent = 'Already have an account?';
+        toggleLink.textContent = 'Sign In';
+        document.getElementById('password').setAttribute('autocomplete', 'new-password');
+      } else {
+        formTitle.textContent = 'Welcome Back';
+        formSubtitle.textContent = 'Sign in to continue your journey';
+        submitBtn.textContent = 'Sign In';
+        nameGroup.style.display = 'none';
+        confirmGroup.style.display = 'none';
+        toggleQuestion.textContent = "Don't have an account?";
+        toggleLink.textContent = 'Sign Up';
+        document.getElementById('password').setAttribute('autocomplete', 'current-password');
+      }
+    };
+
+    // Email/Password Auth
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const name = document.getElementById('name').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!email || !password) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = isSignUp ? 'Creating Account...' : 'Signing In...';
+
+      try {
+        if (isSignUp) {
+          if (password !== confirmPassword) {
+            showToast('Passwords do not match.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign Up';
+            return;
+          }
+          if (password.length < 6) {
+            showToast('Password must be at least 6 characters.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign Up';
+            return;
+          }
+
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          if (name) {
+            await updateProfile(userCredential.user, { displayName: name });
+          }
+          showToast('Account created successfully! Welcome to Ditto.', 'success');
+          setTimeout(() => {
+            // window.location.href = 'dashboard.html';
+          }, 1500);
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+          showToast('Signed in successfully!', 'success');
+          setTimeout(() => {
+            // window.location.href = 'dashboard.html';
+          }, 1500);
+        }
+      } catch (error) {
+        let msg = error.message;
+        if (error.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
+        if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
+        if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
+        if (error.code === 'auth/email-already-in-use') msg = 'An account already exists with this email.';
+        if (error.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
+        if (error.code === 'auth/weak-password') msg = 'Password is too weak. Use at least 6 characters.';
+        showToast(msg, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+      }
+    });
+
+    // Google Sign In
+    window.signInWithGoogle = async function() {
+      googleBtn.disabled = true;
+      try {
+        const result = await signInWithPopup(auth, provider);
+        showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
+        setTimeout(() => {
+          // window.location.href = 'dashboard.html';
+        }, 1500);
+      } catch (error) {
+        let msg = error.message;
+        if (error.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
+        if (error.code === 'auth/popup-blocked') msg = 'Popup was blocked. Please allow popups for this site.';
+        showToast(msg, 'error');
+      } finally {
+        googleBtn.disabled = false;
+      }
+    };
+
+    // Toast
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
+  </script>
+
+</body>
+</html>
