@@ -10,10 +10,8 @@
     html, body { width: 100%; overflow-x: hidden; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #050510;
-      color: white;
-      min-height: 100vh;
-      min-height: 100dvh;
+      background: #050510; color: white;
+      min-height: 100vh; min-height: 100dvh;
     }
 
     .bg {
@@ -22,8 +20,7 @@
         radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.35), transparent 30%),
         radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.25), transparent 30%),
         radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.2), transparent 30%);
-      filter: blur(80px);
-      animation: bgMove 10s infinite alternate ease-in-out;
+      filter: blur(80px); animation: bgMove 10s infinite alternate ease-in-out;
     }
     @keyframes bgMove { 100% { transform: scale(1.08); } }
 
@@ -144,24 +141,17 @@
       box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
     }
 
-    .nav-buttons {
-      display: flex; justify-content: space-between; gap: 12px; margin-top: 30px;
-    }
-    .btn-nav {
-      padding: 14px 32px; border-radius: 40px; border: none;
-      font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif;
-      cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-prev {
-      background: rgba(255,255,255,0.05); color: #94a3b8;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .btn-prev:hover { background: rgba(255,255,255,0.1); color: white; }
-    .btn-next {
+    .continue-btn {
+      width: 100%; padding: 16px; border-radius: 40px;
       background: linear-gradient(90deg, #8b5cf6, #06b6d4); color: white;
+      border: none; font-size: 16px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 20px; display: none;
     }
-    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4); }
-    .btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .continue-btn.show { display: block; }
+    .continue-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5); }
+    .continue-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
     /* Result / DittoID Section */
     .result-card {
@@ -223,7 +213,6 @@
       box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
       background: rgba(139, 92, 246, 0.08);
     }
-    .avatar-option img { width: 100%; height: 100%; object-fit: cover; }
 
     .bio-textarea {
       width: 100%; max-width: 400px; margin: 0 auto 8px;
@@ -267,6 +256,7 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { background: rgba(239, 68, 68, 0.95); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.4); }
+    .toast.success { background: rgba(16, 185, 129, 0.95); box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4); }
 
     @media(max-width: 480px) {
       .question-card { padding: 28px 20px; }
@@ -385,6 +375,7 @@
       <div class="option" data-val="Confronter" data-k="B"><div class="option-letter">B</div><div class="option-text">Say what I think, even if it creates tension</div></div>
       <div class="option" data-val="Compromiser" data-k="C"><div class="option-letter">C</div><div class="option-text">Try to find a middle ground</div></div>
       <div class="option" data-val="Peacemaker" data-k="D"><div class="option-letter">D</div><div class="option-text">Agree with them just to keep the peace</div></div>
+      <button class="continue-btn" id="continueBtn" onclick="nextQuestion()">Continue</button>
     </div>
 
     <!-- Q10 -->
@@ -401,6 +392,7 @@
         <div class="mood-option" data-val="Motivated">Motivated</div>
         <div class="mood-option" data-val="Overwhelmed">Overwhelmed</div>
       </div>
+      <button class="continue-btn" id="continueBtn10" onclick="nextQuestion()">Continue</button>
     </div>
 
     <!-- RESULT / PROFILE SETUP -->
@@ -437,18 +429,14 @@
 
       <button class="btn-finish" id="finishBtn" onclick="finishProfile()" disabled>Complete Profile</button>
     </div>
-
-    <div class="nav-buttons" id="navButtons">
-      <button class="btn-nav btn-prev" id="prevBtn" onclick="prevQuestion()" style="visibility:hidden;">Back</button>
-      <button class="btn-nav btn-next" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
-    </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -462,6 +450,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -473,7 +462,6 @@
     let selectedAvatar = null;
     let dittoidObj = null;
 
-    // Letter mapping
     const letterMap = {
       energy: { social: 'S', quiet: 'Q', balanced: 'B' },
       heart: { deep: 'D', practical: 'P', light: 'L' },
@@ -488,35 +476,27 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = 'login.html'; return; }
       currentUser = user;
-      // Check if profile already completed
       const profileDoc = await getDoc(doc(db, 'users', user.uid));
       if (profileDoc.exists() && profileDoc.data().profileComplete) {
         window.location.href = 'profile.html';
       }
     });
 
-    // Progress bar
     function updateProgress() {
       const pct = ((currentQ - 1) / totalQ) * 100;
       document.getElementById('progressFill').style.width = pct + '%';
       document.getElementById('currentStep').textContent = currentQ;
     }
 
-    // Show question
     function showQuestion(n) {
       document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
       const card = document.querySelector(`.question-card[data-q="${n}"]`);
       if (card) card.classList.add('active');
-
-      document.getElementById('prevBtn').style.visibility = n === 1 ? 'hidden' : 'visible';
-      document.getElementById('nextBtn').textContent = n === totalQ ? 'See Result' : 'Next';
-      document.getElementById('nextBtn').disabled = !answers[n];
-      if (n === totalQ) document.getElementById('nextBtn').disabled = selectedMoods.length === 0;
       updateProgress();
     }
 
-    // Option click
-    document.querySelectorAll('.option').forEach(opt => {
+    // Auto-advance for Q1-Q8
+    document.querySelectorAll('.question-card[data-q="1"] .option, .question-card[data-q="2"] .option, .question-card[data-q="3"] .option, .question-card[data-q="4"] .option, .question-card[data-q="5"] .option, .question-card[data-q="6"] .option, .question-card[data-q="7"] .option, .question-card[data-q="8"] .option').forEach(opt => {
       opt.addEventListener('click', function() {
         const card = this.closest('.question-card');
         const qNum = parseInt(card.dataset.q);
@@ -526,13 +506,40 @@
 
         card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
         this.classList.add('selected');
-
         answers[qNum] = { dim, val, k };
-        document.getElementById('nextBtn').disabled = false;
+
+        // Auto advance after 400ms delay for visual feedback
+        setTimeout(() => {
+          if (currentQ < totalQ) {
+            currentQ++;
+            showQuestion(currentQ);
+            // Show continue button for Q9 and Q10
+            if (currentQ === 9 || currentQ === 10) {
+              const btn = document.getElementById(currentQ === 10 ? 'continueBtn10' : 'continueBtn');
+              if (btn) btn.classList.add('show');
+            }
+          }
+        }, 400);
       });
     });
 
-    // Mood selection (Q10 - multi select, max 2)
+    // Q9 options - show continue button but don't auto advance
+    document.querySelectorAll('.question-card[data-q="9"] .option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        const card = this.closest('.question-card');
+        const qNum = parseInt(card.dataset.q);
+        const dim = card.dataset.dim;
+        const val = this.dataset.val;
+        const k = this.dataset.k;
+
+        card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        answers[qNum] = { dim, val, k };
+        document.getElementById('continueBtn').classList.add('show');
+      });
+    });
+
+    // Q10 mood selection
     document.querySelectorAll('.mood-option').forEach(opt => {
       opt.addEventListener('click', function() {
         const val = this.dataset.val;
@@ -548,27 +555,27 @@
           selectedMoods.push(val);
         }
         answers[10] = { dim: 'mood', val: selectedMoods };
-        document.getElementById('nextBtn').disabled = selectedMoods.length === 0;
+        if (selectedMoods.length > 0) {
+          document.getElementById('continueBtn10').classList.add('show');
+        }
       });
     });
 
     window.nextQuestion = function() {
+      if (currentQ === 9 && !answers[9]) { showToast('Please select an answer first.', 'error'); return; }
+      if (currentQ === 10 && selectedMoods.length === 0) { showToast('Please select at least 1 mood.', 'error'); return; }
+
       if (currentQ < totalQ) {
         currentQ++;
         showQuestion(currentQ);
+        if (currentQ === 10) {
+          document.getElementById('continueBtn10').classList.add('show');
+        }
       } else {
         calculateResult();
       }
     };
 
-    window.prevQuestion = function() {
-      if (currentQ > 1) {
-        currentQ--;
-        showQuestion(currentQ);
-      }
-    };
-
-    // Calculate DittoID
     function calculateResult() {
       const tally = { energy: {}, heart: {} };
       let conflictStyle = '';
@@ -601,12 +608,10 @@
       dittoidObj = { energy, heart, drive };
       const code = `d/${letterMap.energy[energy]}${letterMap.heart[heart]}${letterMap.drive[drive]}`;
 
-      // Show result
       document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
       document.getElementById('resultCard').classList.add('active');
-      document.getElementById('navButtons').style.display = 'none';
-      document.getElementById('progressFill').style.width = '100%';
       document.querySelector('.step-indicator').style.display = 'none';
+      document.getElementById('progressFill').style.width = '100%';
 
       document.getElementById('dittoidCode').textContent = code;
 
@@ -617,7 +622,6 @@
         <div class="breakdown-item"><div class="letter">${letterMap.drive[drive]}</div><div class="meaning">${meaningMap[letterMap.drive[drive]]}</div></div>
       `;
 
-      // Store conflict style and mood
       dittoidObj.conflictStyle = conflictStyle;
       dittoidObj.moodTags = selectedMoods;
     }
@@ -669,7 +673,10 @@
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString(),
           dailyMatchesUsed: 0,
-          lastMatchReset: new Date().toISOString()
+          lastMatchReset: new Date().toISOString(),
+          dittsCount: 0,
+          dittosCount: 0,
+          matchesCount: 0
         });
         showToast('Profile created! Welcome to Ditto.', 'success');
         setTimeout(() => window.location.href = 'profile.html', 1500);
