@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ditto | Ditts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #050510; color: white; min-height: 100vh; min-height: 100dvh;
+      padding-bottom: 80px;
+    }
+
+    .bg {
+      position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.35), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.25), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.2), transparent 30%);
+      filter: blur(80px); animation: bgMove 10s infinite alternate ease-in-out;
+    }
+    @keyframes bgMove { 100% { transform: scale(1.08); } }
+
+    .page-header {
+      padding: 20px 6% 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700;
+    }
+    .page-subtitle { color: #64748b; font-size: 14px; }
+
+    /* FAB - Create Ditt */
+    .fab {
+      position: fixed; bottom: 84px; right: 20px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      border: none; color: white; font-size: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 999;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fab:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(139, 92, 246, 0.6); }
+
+    /* Create Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px); z-index: 2000;
+      display: none; align-items: flex-end; justify-content: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.show { display: flex; opacity: 1; }
+    .modal-content {
+      background: #0a0a1a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px 24px 0 0;
+      width: 100%; max-width: 600px; padding: 24px;
+      transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.show .modal-content { transform: translateY(0); }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; }
+    .modal-close {
+      background: none; border: none; color: #94a3b8; font-size: 24px;
+      cursor: pointer; padding: 4px;
+    }
+    .ditt-textarea {
+      width: 100%; min-height: 120px; padding: 16px;
+      border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03); color: white;
+      font-size: 15px; font-family: 'Inter', sans-serif;
+      resize: vertical; outline: none; margin-bottom: 12px;
+    }
+    .ditt-textarea::placeholder { color: #475569; }
+    .ditt-textarea:focus {
+      border-color: rgba(139, 92, 246, 0.4);
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+    .btn-post {
+      width: 100%; padding: 14px; border-radius: 40px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4); color: white;
+      border: none; font-size: 15px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-post:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
+    .btn-post:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Feed */
+    .feed-container {
+      max-width: 600px; margin: 0 auto; padding: 0 6%;
+    }
+    .ditt-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px; padding: 20px 22px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    .ditt-card:hover {
+      border-color: rgba(139, 92, 246, 0.15);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 30px rgba(139, 92, 246, 0.05);
+    }
+    .ditt-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .ditt-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(6,182,212,0.2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .ditt-meta { flex: 1; }
+    .ditt-name { font-size: 14px; font-weight: 600; color: white; }
+    .ditt-id { font-size: 12px; color: #64748b; }
+    .ditt-time { font-size: 12px; color: #475569; }
+    .ditt-text {
+      font-size: 15px; color: #e2e8f0; line-height: 1.6; margin-bottom: 14px;
+    }
+    .ditt-actions {
+      display: flex; gap: 20px; padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .ditt-action {
+      display: flex; align-items: center; gap: 6px;
+      color: #64748b; font-size: 13px; cursor: pointer;
+      transition: color 0.3s ease; user-select: none;
+    }
+    .ditt-action:hover { color: #a78bfa; }
+    .ditt-action.active { color: #a78bfa; }
+
+    /* Match badge */
+    .match-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .match-true { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+    .match-strong { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+    .match-ditto { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+    .match-none { background: rgba(100,116,139,0.1); color: #64748b; border: 1px solid rgba(100,116,139,0.2); }
+
+    /* Comments section */
+    .comments-section {
+      display: none; margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .comments-section.show { display: block; }
+    .comment-input-row {
+      display: flex; gap: 10px; margin-bottom: 12px;
+    }
+    .comment-input {
+      flex: 1; padding: 10px 14px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03); color: white;
+      font-size: 14px; font-family: 'Inter', sans-serif; outline: none;
+    }
+    .comment-input::placeholder { color: #475569; }
+    .comment-btn {
+      padding: 10px 18px; border-radius: 20px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      color: white; border: none; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .comment-btn:hover { box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+    .comment {
+      display: flex; gap: 10px; margin-bottom: 10px;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .comment:last-child { border-bottom: none; }
+    .comment-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(139,92,246,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .comment-body { flex: 1; }
+    .comment-name { font-size: 12px; font-weight: 600; color: #a78bfa; }
+    .comment-text { font-size: 13px; color: #cbd5e1; line-height: 1.4; margin-top: 2px; }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 64px; background: rgba(5, 5, 16, 0.85);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 1000; padding: 0 10px;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; color: #64748b; text-decoration: none;
+      font-size: 11px; font-weight: 500; transition: all 0.3s ease;
+      cursor: pointer; padding: 6px 16px; border-radius: 12px;
+    }
+    .nav-item .icon { font-size: 20px; }
+    .nav-item:hover, .nav-item.active { color: #a78bfa; }
+    .nav-item.active { background: rgba(139, 92, 246, 0.08); }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: #475569;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: #94a3b8; margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    .toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(139, 92, 246, 0.95); backdrop-filter: blur(20px);
+      color: white; padding: 14px 28px; border-radius: 16px;
+      font-size: 14px; font-weight: 500; z-index: 3000;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Inter', sans-serif; pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: rgba(239, 68, 68, 0.95); }
+    .toast.success { background: rgba(16, 185, 129, 0.95); }
+
+    @media(max-width: 480px) {
+      .page-title { font-size: 22px; }
+      .ditt-card { padding: 16px 18px; }
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Ditts</div>
+      <div class="page-subtitle">Say what you can't say anywhere</div>
+    </div>
+  </div>
+
+  <div class="feed-container" id="feedContainer">
+    <div class="empty-state" id="emptyState">
+      <div class="icon">&#128172;</div>
+      <h3>No ditts yet</h3>
+      <p>Be the first to share your thoughts!</p>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fabBtn" onclick="openModal()">&#43;</button>
+
+  <!-- Create Modal -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Share a Ditt</div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <textarea class="ditt-textarea" id="dittText" placeholder="What's on your mind? Say what you can't say anywhere..."></textarea>
+      <button class="btn-post" id="postBtn" onclick="postDitt()">Post Ditt</button>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="ditts.html" class="nav-item active"><span class="icon">&#128172;</span>Ditts</a>
+    <a href="dittos.html" class="nav-item"><span class="icon">&#129309;</span>Dittos</a>
+    <a href="profile.html" class="nav-item"><span class="icon">&#128100;</span>Profile</a>
+  </nav>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
+      authDomain: "dittoweb.firebaseapp.com",
+      projectId: "dittoweb",
+      storageBucket: "dittoweb.firebasestorage.app",
+      messagingSenderId: "902164300349",
+      appId: "1:902164300349:web:307e58ba6e3e9dbc33a054",
+      measurementId: "G-JP34BSJ3RB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let myDittoid = null;
+    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;' };
+
+    // Auth check + load profile
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists() || !userDoc.data().profileComplete) {
+        window.location.href = 'quiz.html'; return;
+      }
+      myDittoid = userDoc.data().dittoid;
+      loadFeed();
+    });
+
+    // Real-time feed
+    function loadFeed() {
+      const q = query(collection(db, 'ditts'), orderBy('createdAt', 'desc'));
+      onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('feedContainer');
+        if (snapshot.empty) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">&#128172;</div>
+              <h3>No ditts yet</h3>
+              <p>Be the first to share your thoughts!</p>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = '';
+        snapshot.forEach((docSnap) => {
+          const ditt = docSnap.data();
+          const dittId = docSnap.id;
+          const card = createDittCard(ditt, dittId);
+          container.appendChild(card);
+        });
+      });
+    }
+
+    function createDittCard(ditt, dittId) {
+      const div = document.createElement('div');
+      div.className = 'ditt-card';
+
+      // Calculate match tier
+      let matchHtml = '';
+      if (myDittoid && ditt.authorDittoid) {
+        const tier = tierOf(myDittoid, ditt.authorDittoid);
+        const tierClass = tier.tier === 'True Ditto' ? 'match-true' :
+                          tier.tier === 'Strong Ditto' ? 'match-strong' :
+                          tier.tier === 'Ditto' ? 'match-ditto' : 'match-none';
+        const emoji = tier.tier === 'True Ditto' ? '&#128154;' :
+                      tier.tier === 'Strong Ditto' ? '&#128155;' :
+                      tier.tier === 'Ditto' ? '&#128156;' : '';
+        matchHtml = `<span class="match-badge ${tierClass}">${emoji} ${tier.tier} &bull; ${tier.n}/3</span>`;
+      }
+
+      const timeAgo = ditt.createdAt ? timeSince(ditt.createdAt.toDate()) : 'Just now';
+      const liked = ditt.likes && ditt.likes.includes(currentUser.uid);
+      const likeClass = liked ? 'active' : '';
+      const likeCount = ditt.likes ? ditt.likes.length : 0;
+      const commentCount = ditt.comments ? ditt.comments.length : 0;
+
+      div.innerHTML = `
+        <div class="ditt-header">
+          <div class="ditt-avatar">${avatars[ditt.authorAvatar] || '&#129504;'}</div>
+          <div class="ditt-meta">
+            <div class="ditt-name">${escapeHtml(ditt.authorName || 'Anonymous')}</div>
+            <div class="ditt-id">${ditt.authorDittoidCode || 'd/---'}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="ditt-time">${timeAgo}</div>
+            ${matchHtml}
+          </div>
+        </div>
+        <div class="ditt-text">${escapeHtml(ditt.text)}</div>
+        <div class="ditt-actions">
+          <div class="ditt-action ${likeClass}" onclick="toggleLike('${dittId}', this)">
+            <span>${liked ? '&#10084;&#65039;' : '&#129293;'}</span> <span>${likeCount}</span>
+          </div>
+          <div class="ditt-action" onclick="toggleComments('${dittId}', this)">
+            <span>&#128172;</span> <span>${commentCount}</span>
+          </div>
+        </div>
+        <div class="comments-section" id="comments-${dittId}">
+          <div class="comment-input-row">
+            <input type="text" class="comment-input" id="commentInput-${dittId}" placeholder="Write a comment..." onkeydown="if(event.key==='Enter')postComment('${dittId}')">
+            <button class="comment-btn" onclick="postComment('${dittId}')">Send</button>
+          </div>
+          <div id="commentsList-${dittId}"></div>
+        </div>
+      `;
+      return div;
+    }
+
+    // Matching logic
+    function tierOf(a, b) {
+      const dims = ['energy', 'heart', 'drive'];
+      const matches = dims.filter(d => a[d] === b[d]);
+      const n = matches.length;
+      const driveMatch = a.drive === b.drive;
+      if (!driveMatch) return { tier: 'No Ditto', n, driveMatch };
+      if (n === 3) return { tier: 'True Ditto', n, driveMatch };
+      if (n === 2) return { tier: 'Strong Ditto', n, driveMatch };
+      if (n === 1) return { tier: 'Ditto', n, driveMatch };
+      return { tier: 'No Ditto', n, driveMatch };
+    }
+
+    window.openModal = function() {
+      document.getElementById('createModal').classList.add('show');
+      document.getElementById('dittText').focus();
+    };
+    window.closeModal = function() {
+      document.getElementById('createModal').classList.remove('show');
+      document.getElementById('dittText').value = '';
+    };
+
+    window.postDitt = async function() {
+      const text = document.getElementById('dittText').value.trim();
+      if (!text) { showToast('Write something first!', 'error'); return; }
+      if (!currentUser) return;
+
+      const btn = document.getElementById('postBtn');
+      btn.disabled = true; btn.textContent = 'Posting...';
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        const data = userDoc.data();
+        await addDoc(collection(db, 'ditts'), {
+          text: text,
+          authorId: currentUser.uid,
+          authorName: data.displayName || 'Ditto User',
+          authorDittoid: data.dittoid || {},
+          authorDittoidCode: data.dittoidCode || 'd/---',
+          authorAvatar: data.avatar || '1',
+          likes: [],
+          comments: [],
+          createdAt: serverTimestamp()
+        });
+        closeModal();
+        showToast('Ditt posted!', 'success');
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Post Ditt';
+      }
+    };
+
+    window.toggleLike = async function(dittId, el) {
+      if (!currentUser) return;
+      const dittRef = doc(db, 'ditts', dittId);
+      const dittSnap = await getDoc(dittRef);
+      if (!dittSnap.exists()) return;
+      const likes = dittSnap.data().likes || [];
+      const liked = likes.includes(currentUser.uid);
+
+      if (liked) {
+        await updateDoc(dittRef, { likes: arrayRemove(currentUser.uid) });
+        el.classList.remove('active');
+        el.querySelector('span:first-child').innerHTML = '&#129293;';
+      } else {
+        await updateDoc(dittRef, { likes: arrayUnion(currentUser.uid) });
+        el.classList.add('active');
+        el.querySelector('span:first-child').innerHTML = '&#10084;&#65039;';
+      }
+    };
+
+    window.toggleComments = async function(dittId, el) {
+      const section = document.getElementById('comments-' + dittId);
+      const isOpen = section.classList.contains('show');
+      if (isOpen) {
+        section.classList.remove('show');
+        return;
+      }
+      section.classList.add('show');
+
+      // Load comments
+      const dittRef = doc(db, 'ditts', dittId);
+      const dittSnap = await getDoc(dittRef);
+      const comments = dittSnap.data().comments || [];
+      const list = document.getElementById('commentsList-' + dittId);
+      if (comments.length === 0) {
+        list.innerHTML = '<div style="color:#475569;font-size:13px;padding:8px 0;">No comments yet. Be the first!</div>';
+      } else {
+        list.innerHTML = comments.map(c => `
+          <div class="comment">
+            <div class="comment-avatar">${avatars[c.authorAvatar] || '&#129504;'}</div>
+            <div class="comment-body">
+              <div class="comment-name">${escapeHtml(c.authorName)}</div>
+              <div class="comment-text">${escapeHtml(c.text)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    };
+
+    window.postComment = async function(dittId) {
+      const input = document.getElementById('commentInput-' + dittId);
+      const text = input.value.trim();
+      if (!text) return;
+      if (!currentUser) return;
+
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      const data = userDoc.data();
+      const comment = {
+        authorId: currentUser.uid,
+        authorName: data.displayName || 'Ditto User',
+        authorAvatar: data.avatar || '1',
+        text: text,
+        createdAt: new Date().toISOString()
+      };
+
+      await updateDoc(doc(db, 'ditts', dittId), { comments: arrayUnion(comment) });
+      input.value = '';
+      toggleComments(dittId, null); // refresh
+    };
+
+    function timeSince(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'Just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return minutes + 'm ago';
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return hours + 'h ago';
+      const days = Math.floor(hours / 24);
+      return days + 'd ago';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
+  </script>
+</body>
+</html>
