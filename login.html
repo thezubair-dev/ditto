@@ -453,8 +453,11 @@
       }
     });
 
-    // Form handling
-    let isSignUp = false;
+    // Read URL parameter to set initial mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    let isSignUp = (mode === 'signup');
+
     const formTitle = document.getElementById('formTitle');
     const formSubtitle = document.getElementById('formSubtitle');
     const submitBtn = document.getElementById('submitBtn');
@@ -465,8 +468,8 @@
     const authForm = document.getElementById('authForm');
     const googleBtn = document.getElementById('googleBtn');
 
-    window.toggleMode = function() {
-      isSignUp = !isSignUp;
+    // Apply initial mode based on URL
+    function applyMode() {
       if (isSignUp) {
         formTitle.textContent = 'Create Account';
         formSubtitle.textContent = 'Join Ditto and find your people';
@@ -486,6 +489,14 @@
         toggleLink.textContent = 'Sign Up';
         document.getElementById('password').setAttribute('autocomplete', 'current-password');
       }
+    }
+
+    // Run on page load
+    applyMode();
+
+    window.toggleMode = function() {
+      isSignUp = !isSignUp;
+      applyMode();
     };
 
     // Email/Password Auth
