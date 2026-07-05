@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ditto | Find Dittos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #050510; color: white; min-height: 100vh; min-height: 100dvh;
+      padding-bottom: 80px;
+    }
+
+    .bg {
+      position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.35), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.25), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.2), transparent 30%);
+      filter: blur(80px); animation: bgMove 10s infinite alternate ease-in-out;
+    }
+    @keyframes bgMove { 100% { transform: scale(1.08); } }
+
+    .page-header {
+      padding: 20px 6% 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700;
+    }
+    .page-subtitle { color: #64748b; font-size: 14px; }
+
+    .daily-limit {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 8px 14px;
+      font-size: 13px; color: #94a3b8;
+    }
+    .limit-dots { display: flex; gap: 4px; }
+    .limit-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); transition: all 0.3s ease;
+    }
+    .limit-dot.used { background: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,0.4); }
+
+    .find-btn-container {
+      text-align: center; padding: 40px 6%;
+    }
+    .find-btn {
+      padding: 18px 56px; border-radius: 50px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4); color: white;
+      border: none; font-size: 18px; font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif; cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+      position: relative; overflow: hidden;
+    }
+    .find-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 50px rgba(139, 92, 246, 0.5); }
+    .find-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .find-btn::after {
+      content: ''; position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 60%);
+      animation: pulse 3s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+
+    .find-subtitle {
+      color: #64748b; font-size: 14px; margin-top: 16px;
+    }
+
+    /* Match Card */
+    .match-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border-radius: 24px; padding: 28px;
+      margin: 0 6% 20px; max-width: 480px; margin-left: auto; margin-right: auto;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      animation: matchAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      display: none;
+    }
+    .match-card.show { display: block; }
+    @keyframes matchAppear {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .match-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(6,182,212,0.2));
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; margin: 0 auto 16px;
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+    }
+    .match-name {
+      font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .match-dittoid {
+      font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 8px;
+    }
+    .match-bio {
+      color: #94a3b8; font-size: 14px; line-height: 1.5;
+      margin-bottom: 20px; max-width: 320px; margin-left: auto; margin-right: auto;
+    }
+
+    .match-tier-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 20px; border-radius: 30px;
+      font-size: 14px; font-weight: 700; margin-bottom: 20px;
+    }
+    .tier-true {
+      background: rgba(16, 185, 129, 0.1); color: #34d399;
+      border: 1px solid rgba(16,185,129,0.25);
+      box-shadow: 0 0 20px rgba(16,185,129,0.1);
+    }
+    .tier-strong {
+      background: rgba(251, 191, 36, 0.1); color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.25);
+      box-shadow: 0 0 20px rgba(251,191,36,0.1);
+    }
+    .tier-ditto {
+      background: rgba(139, 92, 246, 0.1); color: #a78bfa;
+      border: 1px solid rgba(139,92,246,0.25);
+      box-shadow: 0 0 20px rgba(139,92,246,0.1);
+    }
+
+    .match-breakdown {
+      display: flex; justify-content: center; gap: 16px;
+      margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .match-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 12px 16px; text-align: center;
+      min-width: 100px;
+    }
+    .match-item .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .match-item .value { font-size: 14px; font-weight: 600; }
+    .match-item .value.match { color: #34d399; }
+    .match-item .value.nomatch { color: #f87171; }
+
+    .match-actions {
+      display: flex; gap: 12px; justify-content: center;
+    }
+    .match-btn {
+      padding: 12px 28px; border-radius: 30px;
+      font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
+      cursor: pointer; transition: all 0.3s ease; border: none;
+    }
+    .btn-message {
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4); color: white;
+    }
+    .btn-message:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
+    .btn-skip {
+      background: rgba(255,255,255,0.05); color: #94a3b8;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-skip:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* My Dittos List */
+    .my-dittos-section {
+      padding: 0 6%; max-width: 600px; margin: 0 auto;
+    }
+    .section-header {
+      font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600;
+      color: #a78bfa; text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px; margin-top: 20px;
+    }
+    .dittos-list {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .dittos-item {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px; padding: 14px 18px;
+      cursor: pointer; transition: all 0.3s ease;
+      text-decoration: none; color: inherit;
+    }
+    .dittos-item:hover {
+      border-color: rgba(139, 92, 246, 0.2);
+      background: rgba(139, 92, 246, 0.04);
+    }
+    .dittos-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(6,182,212,0.2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .dittos-info { flex: 1; }
+    .dittos-name { font-size: 14px; font-weight: 600; }
+    .dittos-id { font-size: 12px; color: #64748b; }
+    .dittos-tier {
+      font-size: 11px; font-weight: 600; padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Chat Modal */
+    .chat-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px); z-index: 3000;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .chat-overlay.show { display: flex; }
+    .chat-container {
+      width: 100%; max-width: 600px; height: 80vh;
+      background: #0a0a1a; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px 24px 0 0;
+      display: flex; flex-direction: column;
+    }
+    .chat-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .chat-back {
+      background: none; border: none; color: #94a3b8;
+      font-size: 20px; cursor: pointer;
+    }
+    .chat-title { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-msg {
+      max-width: 75%; padding: 10px 14px; border-radius: 16px;
+      font-size: 14px; line-height: 1.5;
+    }
+    .chat-msg.sent {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      color: white; border-bottom-right-radius: 4px;
+    }
+    .chat-msg.received {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.06);
+      color: #e2e8f0; border-bottom-left-radius: 4px;
+    }
+    .chat-input-row {
+      display: flex; gap: 10px; padding: 12px 20px 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .chat-input {
+      flex: 1; padding: 12px 16px; border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03); color: white;
+      font-size: 14px; font-family: 'Inter', sans-serif; outline: none;
+    }
+    .chat-send {
+      padding: 12px 20px; border-radius: 24px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      color: white; border: none; font-size: 14px; font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 64px; background: rgba(5, 5, 16, 0.85);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 1000; padding: 0 10px;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; color: #64748b; text-decoration: none;
+      font-size: 11px; font-weight: 500; transition: all 0.3s ease;
+      cursor: pointer; padding: 6px 16px; border-radius: 12px;
+    }
+    .nav-item .icon { font-size: 20px; }
+    .nav-item:hover, .nav-item.active { color: #a78bfa; }
+    .nav-item.active { background: rgba(139, 92, 246, 0.08); }
+
+    .toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(139, 92, 246, 0.95); backdrop-filter: blur(20px);
+      color: white; padding: 14px 28px; border-radius: 16px;
+      font-size: 14px; font-weight: 500; z-index: 4000;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Inter', sans-serif; pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: rgba(239, 68, 68, 0.95); }
+    .toast.success { background: rgba(16, 185, 129, 0.95); }
+
+    @media(max-width: 480px) {
+      .page-title { font-size: 22px; }
+      .find-btn { padding: 16px 40px; font-size: 16px; }
+      .match-card { padding: 20px; margin: 0 4% 16px; }
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Find Dittos</div>
+      <div class="page-subtitle">Discover people who think like you</div>
+    </div>
+    <div class="daily-limit">
+      <span>Today:</span>
+      <div class="limit-dots">
+        <div class="limit-dot" id="dot1"></div>
+        <div class="limit-dot" id="dot2"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="find-btn-container" id="findContainer">
+    <button class="find-btn" id="findBtn" onclick="findDitto()">Find My Ditto</button>
+    <div class="find-subtitle" id="findSubtitle">You can find 2 dittos per day</div>
+  </div>
+
+  <!-- Match Result Card -->
+  <div class="match-card" id="matchCard">
+    <div class="match-avatar" id="matchAvatar">&#129504;</div>
+    <div class="match-name" id="matchName">Name</div>
+    <div class="match-dittoid" id="matchDittoid">d/---</div>
+    <div class="match-bio" id="matchBio">Bio</div>
+    <div class="match-tier-badge" id="matchTier">True Ditto</div>
+    <div class="match-breakdown" id="matchBreakdown"></div>
+    <div class="match-actions">
+      <button class="match-btn btn-message" onclick="openChat()">Message</button>
+      <button class="match-btn btn-skip" onclick="skipMatch()">Skip</button>
+    </div>
+  </div>
+
+  <!-- My Dittos -->
+  <div class="my-dittos-section" id="myDittosSection" style="display:none;">
+    <div class="section-header">Your Dittos</div>
+    <div class="dittos-list" id="dittosList"></div>
+  </div>
+
+  <!-- Chat Modal -->
+  <div class="chat-overlay" id="chatOverlay">
+    <div class="chat-container">
+      <div class="chat-header">
+        <button class="chat-back" onclick="closeChat()">&#8592;</button>
+        <div class="chat-title" id="chatTitle">Chat</div>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="chat-send" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="ditts.html" class="nav-item"><span class="icon">&#128172;</span>Ditts</a>
+    <a href="dittos.html" class="nav-item active"><span class="icon">&#129309;</span>Dittos</a>
+    <a href="profile.html" class="nav-item"><span class="icon">&#128100;</span>Profile</a>
+  </nav>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, addDoc, updateDoc, onSnapshot, orderBy, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
+      authDomain: "dittoweb.firebaseapp.com",
+      projectId: "dittoweb",
+      storageBucket: "dittoweb.firebasestorage.app",
+      messagingSenderId: "902164300349",
+      appId: "1:902164300349:web:307e58ba6e3e9dbc33a054",
+      measurementId: "G-JP34BSJ3RB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let myData = null;
+    let currentMatch = null;
+    let dailyUsed = 0;
+    const MAX_DAILY = 2;
+    const avatars = { '1': '&#129504;', '2': '&#10084;&#65039;', '3': '&#128064;', '4': '&#128170;', '5': '&#128066;', '6': '&#128099;' };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists() || !userDoc.data().profileComplete) {
+        window.location.href = 'quiz.html'; return;
+      }
+      myData = userDoc.data();
+      checkDailyLimit();
+      loadMyDittos();
+    });
+
+    function checkDailyLimit() {
+      const lastReset = myData.lastMatchReset ? new Date(myData.lastMatchReset) : new Date(0);
+      const now = new Date();
+      const isNewDay = lastReset.getDate() !== now.getDate() || lastReset.getMonth() !== now.getMonth() || lastReset.getFullYear() !== now.getFullYear();
+
+      if (isNewDay) {
+        dailyUsed = 0;
+        updateDoc(doc(db, 'users', currentUser.uid), { dailyMatchesUsed: 0, lastMatchReset: now.toISOString() });
+      } else {
+        dailyUsed = myData.dailyMatchesUsed || 0;
+      }
+
+      updateLimitUI();
+    }
+
+    function updateLimitUI() {
+      document.getElementById('dot1').classList.toggle('used', dailyUsed >= 1);
+      document.getElementById('dot2').classList.toggle('used', dailyUsed >= 2);
+      const btn = document.getElementById('findBtn');
+      const sub = document.getElementById('findSubtitle');
+      if (dailyUsed >= MAX_DAILY) {
+        btn.disabled = true;
+        btn.textContent = 'Come Back Tomorrow';
+        sub.textContent = 'You have used all your daily matches';
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Find My Ditto';
+        sub.textContent = `You can find ${MAX_DAILY - dailyUsed} more ditto${MAX_DAILY - dailyUsed !== 1 ? 's' : ''} today`;
+      }
+    }
+
+    // Matching logic
+    function tierOf(a, b) {
+      const dims = ['energy', 'heart', 'drive'];
+      const matches = dims.filter(d => a[d] === b[d]);
+      const n = matches.length;
+      const driveMatch = a.drive === b.drive;
+      if (!driveMatch) return { tier: 'No Ditto', n, driveMatch };
+      if (n === 3) return { tier: 'True Ditto', n, driveMatch };
+      if (n === 2) return { tier: 'Strong Ditto', n, driveMatch };
+      if (n === 1) return { tier: 'Ditto', n, driveMatch };
+      return { tier: 'No Ditto', n, driveMatch };
+    }
+
+    window.findDitto = async function() {
+      if (dailyUsed >= MAX_DAILY) { showToast('Daily limit reached!', 'error'); return; }
+      if (!myData) return;
+
+      const btn = document.getElementById('findBtn');
+      btn.disabled = true; btn.textContent = 'Searching...';
+
+      try {
+        // Get all users except self
+        const allUsersSnap = await getDocs(collection(db, 'users'));
+        const candidates = [];
+        allUsersSnap.forEach(docSnap => {
+          const u = docSnap.data();
+          if (u.uid !== currentUser.uid && u.profileComplete && u.dittoid) {
+            const tier = tierOf(myData.dittoid, u.dittoid);
+            if (tier.tier !== 'No Ditto') {
+              candidates.push({ ...u, tier, uid: u.uid });
+            }
+          }
+        });
+
+        if (candidates.length === 0) {
+          showToast('No matches found right now. Try again later!', 'error');
+          btn.disabled = false; btn.textContent = 'Find My Ditto';
+          return;
+        }
+
+        // Sort by tier quality
+        const tierOrder = { 'True Ditto': 3, 'Strong Ditto': 2, 'Ditto': 1 };
+        candidates.sort((a, b) => tierOrder[b.tier.tier] - tierOrder[a.tier.tier]);
+
+        // Pick random from top tier
+        const topTier = candidates[0].tier.tier;
+        const topCandidates = candidates.filter(c => c.tier.tier === topTier);
+        currentMatch = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+
+        // Show match card
+        showMatchCard(currentMatch);
+
+        // Save match
+        await setDoc(doc(db, 'matches', `${currentUser.uid}_${currentMatch.uid}`), {
+          user1: currentUser.uid,
+          user2: currentMatch.uid,
+          tier: currentMatch.tier.tier,
+          createdAt: serverTimestamp()
+        });
+
+        // Increment daily count
+        dailyUsed++;
+        await updateDoc(doc(db, 'users', currentUser.uid), { dailyMatchesUsed: dailyUsed });
+        updateLimitUI();
+
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+        btn.disabled = false; btn.textContent = 'Find My Ditto';
+      }
+    };
+
+    function showMatchCard(match) {
+      document.getElementById('findContainer').style.display = 'none';
+      const card = document.getElementById('matchCard');
+      card.classList.add('show');
+
+      document.getElementById('matchAvatar').innerHTML = avatars[match.avatar] || '&#129504;';
+      document.getElementById('matchName').textContent = match.displayName || 'Ditto User';
+      document.getElementById('matchDittoid').textContent = match.dittoidCode || 'd/---';
+      document.getElementById('matchBio').textContent = match.bio || '';
+
+      const tier = match.tier;
+      const tierEl = document.getElementById('matchTier');
+      tierEl.textContent = `${tier.tier} ${tier.tier === 'True Ditto' ? '&#128154;' : tier.tier === 'Strong Ditto' ? '&#128155;' : '&#128156;'}`;
+      tierEl.className = 'match-tier-badge ' + (tier.tier === 'True Ditto' ? 'tier-true' : tier.tier === 'Strong Ditto' ? 'tier-strong' : 'tier-ditto');
+
+      const breakdown = document.getElementById('matchBreakdown');
+      breakdown.innerHTML = `
+        <div class="match-item"><div class="label">Energy</div><div class="value ${myData.dittoid.energy === match.dittoid.energy ? 'match' : 'nomatch'}">${capitalize(match.dittoid.energy)}</div></div>
+        <div class="match-item"><div class="label">Heart</div><div class="value ${myData.dittoid.heart === match.dittoid.heart ? 'match' : 'nomatch'}">${capitalize(match.dittoid.heart)}</div></div>
+        <div class="match-item"><div class="label">Drive</div><div class="value ${myData.dittoid.drive === match.dittoid.drive ? 'match' : 'nomatch'}">${capitalize(match.dittoid.drive)}</div></div>
+      `;
+    }
+
+    window.skipMatch = function() {
+      document.getElementById('matchCard').classList.remove('show');
+      document.getElementById('findContainer').style.display = 'block';
+      currentMatch = null;
+    };
+
+    // Chat
+    window.openChat = function() {
+      if (!currentMatch) return;
+      document.getElementById('chatOverlay').classList.add('show');
+      document.getElementById('chatTitle').textContent = currentMatch.displayName || 'Ditto User';
+      loadChatMessages();
+    };
+
+    window.closeChat = function() {
+      document.getElementById('chatOverlay').classList.remove('show');
+    };
+
+    function loadChatMessages() {
+      if (!currentMatch) return;
+      const chatId = [currentUser.uid, currentMatch.uid].sort().join('_');
+      const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'asc'));
+      onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+        snapshot.forEach(docSnap => {
+          const msg = docSnap.data();
+          const div = document.createElement('div');
+          div.className = 'chat-msg ' + (msg.senderId === currentUser.uid ? 'sent' : 'received');
+          div.textContent = msg.text;
+          container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    window.sendMessage = async function() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || !currentMatch) return;
+
+      const chatId = [currentUser.uid, currentMatch.uid].sort().join('_');
+      await addDoc(collection(db, 'chats', chatId, 'messages'), {
+        senderId: currentUser.uid,
+        senderName: myData.displayName || 'Ditto User',
+        text: text,
+        createdAt: serverTimestamp()
+      });
+      input.value = '';
+    };
+
+    // Load my dittos
+    async function loadMyDittos() {
+      const q = query(collection(db, 'matches'), where('user1', '==', currentUser.uid));
+      const q2 = query(collection(db, 'matches'), where('user2', '==', currentUser.uid));
+      const [snap1, snap2] = await Promise.all([getDocs(q), getDocs(q2)]);
+
+      const matches = [];
+      snap1.forEach(d => matches.push(d.data()));
+      snap2.forEach(d => matches.push(d.data()));
+
+      if (matches.length === 0) return;
+
+      document.getElementById('myDittosSection').style.display = 'block';
+      const list = document.getElementById('dittosList');
+      list.innerHTML = '';
+
+      for (const m of matches) {
+        const otherId = m.user1 === currentUser.uid ? m.user2 : m.user1;
+        const otherDoc = await getDoc(doc(db, 'users', otherId));
+        if (!otherDoc.exists()) continue;
+        const other = otherDoc.data();
+
+        const tierClass = m.tier === 'True Ditto' ? 'tier-true' : m.tier === 'Strong Ditto' ? 'tier-strong' : 'tier-ditto';
+        const tierColor = m.tier === 'True Ditto' ? '#34d399' : m.tier === 'Strong Ditto' ? '#fbbf24' : '#a78bfa';
+
+        const item = document.createElement('div');
+        item.className = 'dittos-item';
+        item.innerHTML = `
+          <div class="dittos-avatar">${avatars[other.avatar] || '&#129504;'}</div>
+          <div class="dittos-info">
+            <div class="dittos-name">${other.displayName || 'Ditto User'}</div>
+            <div class="dittos-id">${other.dittoidCode || 'd/---'}</div>
+          </div>
+          <div class="dittos-tier ${tierClass}">${m.tier}</div>
+        `;
+        item.onclick = () => {
+          currentMatch = other;
+          openChat();
+        };
+        list.appendChild(item);
+      }
+    }
+
+    function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '-'; }
+
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
+  </script>
+</body>
+</html>
