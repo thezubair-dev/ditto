@@ -364,7 +364,8 @@
       </div>
       <span class="logo-text">Ditto.</span>
     </a>
-    <a href="index.html" class="back-btn">&#8592; Back to Home</a>
+    <button class="back-btn" id="logoutBtn" onclick="logoutUser()" style="display:none;">&#8592; Logout</button>
+    <a href="index.html" class="back-btn" id="backHomeBtn">&#8592; Back to Home</a>
   </nav>
 
   <!-- LOGIN / SIGNUP CARD -->
@@ -376,11 +377,7 @@
       </div>
 
       <form id="authForm" onsubmit="return false;">
-        <!-- Name field (only for signup) -->
-        <div class="form-group" id="nameGroup" style="display:none;">
-          <label for="name">Full Name</label>
-          <input type="text" id="name" placeholder="Enter your name" autocomplete="name">
-        </div>
+
 
         <div class="form-group">
           <label for="email">Email</label>
@@ -427,7 +424,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -455,9 +452,25 @@
     }
 
     // Check auth state and redirect
+    // Check URL mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlMode = urlParams.get('mode');
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log("User logged in:", user.uid);
+        // Show logout button, hide back home
+        const logoutBtn = document.getElementById('logoutBtn');
+        const backHomeBtn = document.getElementById('backHomeBtn');
+        if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+        if (backHomeBtn) backHomeBtn.style.display = 'none';
+
+        // Only auto-redirect if NOT in signup mode intentionally
+        if (urlMode === 'signup') {
+          // User wants to create new account - stay on page
+          return;
+        }
+
         // Check if profile is complete
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -484,7 +497,7 @@
     const formTitle = document.getElementById('formTitle');
     const formSubtitle = document.getElementById('formSubtitle');
     const submitBtn = document.getElementById('submitBtn');
-    const nameGroup = document.getElementById('nameGroup');
+    // nameGroup removed
     const confirmGroup = document.getElementById('confirmGroup');
     const toggleQuestion = document.getElementById('toggleQuestion');
     const toggleLink = document.getElementById('toggleLink');
@@ -497,7 +510,7 @@
         formTitle.textContent = 'Create Account';
         formSubtitle.textContent = 'Join Ditto and find your people';
         submitBtn.textContent = 'Sign Up';
-        nameGroup.style.display = 'block';
+        // name field removed
         confirmGroup.style.display = 'block';
         toggleQuestion.textContent = 'Already have an account?';
         toggleLink.textContent = 'Sign In';
@@ -506,7 +519,7 @@
         formTitle.textContent = 'Welcome Back';
         formSubtitle.textContent = 'Sign in to continue your journey';
         submitBtn.textContent = 'Sign In';
-        nameGroup.style.display = 'none';
+        // nameGroup removed
         confirmGroup.style.display = 'none';
         toggleQuestion.textContent = "Don't have an account?";
         toggleLink.textContent = 'Sign Up';
@@ -517,17 +530,33 @@
     // Run on page load
     applyMode();
 
-    window.toggleMode = function() {
+    window.toggleMode = async function() {
+      // If switching to signup while logged in, sign out first
+      if (!isSignUp && auth.currentUser) {
+        await signOut(auth);
+        localStorage.clear();
+      }
       isSignUp = !isSignUp;
       applyMode();
-    };
+    }
+
+    // Logout function
+    window.logoutUser = async function() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = 'login.html';
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+    };;
 
     // Email/Password Auth
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const name = document.getElementById('name').value.trim();
+      // name field removed
       const confirmPassword = document.getElementById('confirmPassword').value;
 
       if (!email || !password) {
@@ -554,15 +583,13 @@
           }
 
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          if (name) {
-            await updateProfile(userCredential.user, { displayName: name });
-          }
+          // name field removed - no displayName update
           showToast('Account created successfully! Welcome to Ditto.', 'success');
-          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+          // Redirect handled by onAuthStateChanged
         } else {
           await signInWithEmailAndPassword(auth, email, password);
           showToast('Signed in successfully!', 'success');
-          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+          // Redirect handled by onAuthStateChanged
         }
       } catch (error) {
         let msg = error.message;
@@ -586,17 +613,7 @@
         const result = await signInWithPopup(auth, provider);
         console.log("Google sign-in success:", result.user.uid);
         showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
-        // Check profile and redirect
-        try {
-          const userDoc = await getDoc(doc(db, 'users', result.user.uid));
-          if (userDoc.exists() && userDoc.data().profileComplete) {
-            setTimeout(() => { window.location.href = 'profile.html'; }, 1500);
-          } else {
-            setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
-          }
-        } catch (err) {
-          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
-        }
+        // Redirect handled by onAuthStateChanged
       } catch (error) {
         let msg = error.message;
         if (error.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
