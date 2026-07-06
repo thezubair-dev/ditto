@@ -446,6 +446,14 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
+    // Toast helper (defined early to avoid hoisting issues)
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
     // Check auth state and redirect
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -599,13 +607,7 @@
       }
     };
 
-    // Toast
-    window.showToast = function(msg, type = '') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast show' + (type ? ' ' + type : '');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    };
+    
   </script>
 
 </body>
