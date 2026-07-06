@@ -231,13 +231,14 @@
     <a href="ditts.html" class="nav-item"><span class="icon">&#128172;</span>Ditts</a>
     <a href="dittos.html" class="nav-item"><span class="icon">&#129309;</span>Dittos</a>
     <a href="profile.html" class="nav-item active"><span class="icon">&#128100;</span>Profile</a>
+    <a class="nav-item" onclick="logoutUser()" style="cursor:pointer;"><span class="icon">&#128682;</span>Logout</a>
   </nav>
 
   <div id="toast" class="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -322,6 +323,16 @@
     }
 
     function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '-'; }
-  </script>
+  
+
+    window.logoutUser = async function() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = 'login.html';
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+    };</script>
 </body>
 </html>
