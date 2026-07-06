@@ -25,6 +25,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     /* ===== BACKGROUND ===== */
@@ -200,10 +202,12 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.03);
       color: white;
-      font-size: 15px;
+      font-size: 16px; /* Prevents iOS zoom on focus */
       font-family: 'Inter', sans-serif;
       outline: none;
       transition: all 0.3s ease;
+      -webkit-appearance: none;
+      appearance: none;
     }
     .form-group input::placeholder {
       color: #64748b;
@@ -400,7 +404,7 @@
 
       <div class="divider">or</div>
 
-      <button class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
+      <button type="button" class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
         <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
           <path fill="#4285F4" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -424,7 +428,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -607,22 +611,49 @@
     });
 
     // Google Sign In
+    // Detect mobile devices
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    }
+
     window.signInWithGoogle = async function() {
       googleBtn.disabled = true;
       try {
-        const result = await signInWithPopup(auth, provider);
-        console.log("Google sign-in success:", result.user.uid);
-        showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
-        // Redirect handled by onAuthStateChanged
+        if (isMobile()) {
+          // Use redirect for mobile (popups blocked on mobile browsers)
+          await signInWithRedirect(auth, provider);
+          // Page will redirect to Google and back
+        } else {
+          // Use popup for desktop
+          const result = await signInWithPopup(auth, provider);
+          console.log("Google sign-in success:", result.user.uid);
+          showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
+          // Redirect handled by onAuthStateChanged
+        }
       } catch (error) {
         let msg = error.message;
         if (error.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
         if (error.code === 'auth/popup-blocked') msg = 'Popup was blocked. Please allow popups for this site.';
         showToast(msg, 'error');
-      } finally {
         googleBtn.disabled = false;
       }
     };
+
+    // Handle redirect result (for mobile Google sign-in)
+    getRedirectResult(auth).then((result) => {
+      if (result) {
+        console.log("Google redirect sign-in success:", result.user.uid);
+        showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
+        // Redirect handled by onAuthStateChanged
+      }
+    }).catch((error) => {
+      if (error.code !== 'auth/null-user') {
+        console.error("Redirect result error:", error);
+        let msg = error.message;
+        if (error.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
+        showToast(msg, 'error');
+      }
+    });
 
     
   </script>
