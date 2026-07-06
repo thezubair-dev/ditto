@@ -3,274 +3,359 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ditto | Complete Your Profile</title>
+  <title>Ditto | Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; overflow-x: hidden; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #050510; color: white;
-      min-height: 100vh; min-height: 100dvh;
+      background: #050510;
+      color: white;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
+    /* ===== BACKGROUND ===== */
     .bg {
-      position: fixed; inset: 0; z-index: -2;
+      position: fixed;
+      inset: 0;
+      z-index: -2;
       background:
         radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.35), transparent 30%),
         radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.25), transparent 30%),
         radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.2), transparent 30%);
-      filter: blur(80px); animation: bgMove 10s infinite alternate ease-in-out;
+      filter: blur(80px);
+      animation: bgMove 10s infinite alternate ease-in-out;
     }
     @keyframes bgMove { 100% { transform: scale(1.08); } }
 
+    /* ===== NAVBAR ===== */
     nav {
-      height: 70px; display: flex; justify-content: space-between; align-items: center;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 0 6%;
       background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
     .logo-text {
-      font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
       background: linear-gradient(90deg, #a855f7, #06b6d4, #10b981);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .ditto-logo-nav { width: 38px; height: 38px; position: relative; flex-shrink: 0; }
-    .mind-nav { width: 13px; height: 18px; position: absolute; top: 8px; border-radius: 60% 60% 35% 60%; }
-    .left-nav { left: 4px; background: linear-gradient(135deg, #8b5cf6, #ec4899); transform: rotate(-35deg); }
-    .right-nav { right: 4px; background: linear-gradient(135deg, #06b6d4, #10b981); transform: rotate(145deg); }
-
-    .progress-bar {
-      position: fixed; top: 70px; left: 0; right: 0; height: 3px;
-      background: rgba(255,255,255,0.05); z-index: 99;
-    }
-    .progress-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
-      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .quiz-container {
-      max-width: 640px; margin: 0 auto; padding: 40px 20px 80px;
+    .ditto-logo-nav {
+      width: 38px;
+      height: 38px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .mind-nav {
+      width: 13px;
+      height: 18px;
+      position: absolute;
+      top: 8px;
+      border-radius: 60% 60% 35% 60%;
+    }
+    .left-nav {
+      left: 4px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      transform: rotate(-35deg);
+    }
+    .right-nav {
+      right: 4px;
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+      transform: rotate(145deg);
     }
 
-    .step-indicator {
-      text-align: center; margin-bottom: 30px;
-      font-family: 'Space Grotesk', sans-serif; font-size: 14px;
-      color: #64748b; letter-spacing: 1px; text-transform: uppercase;
+    .back-btn {
+      padding: 10px 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
-    .step-indicator span { color: #a78bfa; font-weight: 600; }
+    .back-btn:hover {
+      background: #10b981;
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      transform: translateY(-3px);
+    }
 
-    .question-card {
+    /* ===== LOGIN CARD ===== */
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      margin-top: 80px;
+      margin-bottom: 40px;
+    }
+
+    .login-card {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-      border-radius: 28px; padding: 36px 32px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03) inset;
-      margin-bottom: 24px; display: none;
-      animation: fadeIn 0.4s ease;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 28px;
+      padding: 40px 36px;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 0 80px rgba(139, 92, 246, 0.06);
+      position: relative;
+      overflow: hidden;
     }
-    .question-card.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-    .question-number {
-      font-family: 'Space Grotesk', sans-serif; font-size: 13px;
-      color: #a78bfa; font-weight: 600; letter-spacing: 1px;
-      text-transform: uppercase; margin-bottom: 12px;
-    }
-    .question-text {
-      font-family: 'Space Grotesk', sans-serif; font-size: 22px;
-      font-weight: 700; line-height: 1.3; margin-bottom: 28px;
-    }
-
-    .option {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 16px 18px; border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
-      margin-bottom: 10px; cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .option:hover {
-      border-color: rgba(139, 92, 246, 0.3);
-      background: rgba(139, 92, 246, 0.06);
-      transform: translateX(4px);
-    }
-    .option.selected {
-      border-color: rgba(139, 92, 246, 0.5);
-      background: rgba(139, 92, 246, 0.1);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
-    }
-    .option-letter {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; color: #94a3b8;
-      flex-shrink: 0; margin-top: 2px;
-      transition: all 0.3s ease;
-    }
-    .option.selected .option-letter {
-      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-      border-color: transparent; color: white;
-    }
-    .option-text { font-size: 15px; color: #e2e8f0; line-height: 1.5; }
-
-    .mood-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-    }
-    .mood-option {
-      padding: 14px 16px; border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.02);
-      text-align: center; cursor: pointer;
-      font-size: 14px; color: #cbd5e1;
-      transition: all 0.3s ease;
-    }
-    .mood-option:hover {
-      border-color: rgba(139, 92, 246, 0.3);
-      background: rgba(139, 92, 246, 0.06);
-    }
-    .mood-option.selected {
-      border-color: rgba(139, 92, 246, 0.5);
-      background: rgba(139, 92, 246, 0.12);
-      color: white;
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+    .login-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.04), transparent 60%);
+      pointer-events: none;
     }
 
-    .continue-btn {
-      width: 100%; padding: 16px; border-radius: 40px;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4); color: white;
-      border: none; font-size: 16px; font-weight: 600;
-      font-family: 'Inter', sans-serif; cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      margin-top: 20px; display: none;
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
     }
-    .continue-btn.show { display: block; }
-    .continue-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5); }
-    .continue-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    /* Result / DittoID Section */
-    .result-card {
-      display: none; text-align: center; padding: 40px 32px;
-    }
-    .result-card.active { display: block; animation: fadeIn 0.6s ease; }
-    .result-title {
-      font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700;
+    .login-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
       margin-bottom: 8px;
       background: linear-gradient(90deg, #a855f7, #06b6d4);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .result-sub { color: #94a3b8; font-size: 15px; margin-bottom: 30px; }
-
-    .dittoid-display {
-      display: inline-flex; align-items: center; gap: 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      border-radius: 20px; padding: 20px 32px;
-      margin-bottom: 30px;
-    }
-    .dittoid-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
-    .dittoid-code {
-      font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4, #10b981);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      letter-spacing: 4px;
-    }
-    .dittoid-breakdown {
-      display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-      margin-bottom: 30px;
-    }
-    .breakdown-item {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px; padding: 16px 20px; text-align: center;
-      min-width: 120px;
-    }
-    .breakdown-item .letter {
-      font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700;
-      color: #a78bfa; margin-bottom: 4px;
-    }
-    .breakdown-item .meaning { font-size: 12px; color: #64748b; }
-
-    .avatar-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
-      max-width: 500px; margin: 0 auto 24px;
-    }
-    .avatar-option {
-      aspect-ratio: 1; border-radius: 16px;
-      border: 2px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 40px; transition: all 0.3s ease; overflow: hidden;
-    }
-    .avatar-option:hover { border-color: rgba(139, 92, 246, 0.3); transform: scale(1.05); }
-    .avatar-option.selected {
-      border-color: #8b5cf6;
-      box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
-      background: rgba(139, 92, 246, 0.08);
+    .login-header p {
+      color: #94a3b8;
+      font-size: 14px;
     }
 
-    .bio-textarea {
-      width: 100%; max-width: 400px; margin: 0 auto 8px;
-      padding: 14px 18px; border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.03); color: white;
-      font-size: 15px; font-family: 'Inter', sans-serif;
-      outline: none; resize: vertical; min-height: 80px;
+    /* ===== FORM ===== */
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .form-group label {
       display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
     }
-    .bio-textarea::placeholder { color: #475569; }
-    .bio-textarea:focus {
+    .form-group input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .form-group input::placeholder {
+      color: #64748b;
+    }
+    .form-group input:focus {
       border-color: rgba(139, 92, 246, 0.5);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
-    }
-    .bio-counter {
-      text-align: center; font-size: 12px; color: #64748b;
-      margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.1) inset;
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    .btn-finish {
-      padding: 16px 48px; border-radius: 40px;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4); color: white;
-      border: none; font-size: 16px; font-weight: 600;
-      font-family: 'Inter', sans-serif; cursor: pointer;
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      border-radius: 40px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
     }
-    .btn-finish:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5); }
-    .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      color: #64748b;
+      font-size: 13px;
+      position: relative;
+      z-index: 1;
+    }
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .google-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .google-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .google-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .toggle-text {
+      text-align: center;
+      margin-top: 24px;
+      color: #94a3b8;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    .toggle-text a {
+      color: #a78bfa;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .toggle-text a:hover {
+      color: #c4b5fd;
+    }
+
+    /* ===== TOAST ===== */
     .toast {
-      position: fixed; bottom: 30px; left: 50%;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: rgba(139, 92, 246, 0.95); backdrop-filter: blur(20px);
-      color: white; padding: 14px 28px; border-radius: 16px;
-      font-size: 14px; font-weight: 500; z-index: 1000;
+      background: rgba(139, 92, 246, 0.95);
+      backdrop-filter: blur(20px);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
       border: 1px solid rgba(255,255,255,0.1);
       box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      font-family: 'Inter', sans-serif; pointer-events: none;
+      font-family: 'Inter', sans-serif;
+      pointer-events: none;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { background: rgba(239, 68, 68, 0.95); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.4); }
     .toast.success { background: rgba(16, 185, 129, 0.95); box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4); }
 
+    /* ===== RESPONSIVE ===== */
     @media(max-width: 480px) {
-      .question-card { padding: 28px 20px; }
-      .question-text { font-size: 18px; }
-      .dittoid-code { font-size: 32px; }
-      .avatar-grid { grid-template-columns: repeat(3, 1fr); }
-      .breakdown-item { min-width: 100px; padding: 12px 14px; }
+      .login-card {
+        padding: 32px 24px;
+        border-radius: 22px;
+      }
+      .login-header h2 {
+        font-size: 26px;
+      }
+      nav {
+        padding: 14px 5%;
+      }
     }
   </style>
+
 <base target="_blank">
 </head>
 <body>
+
   <div class="bg" aria-hidden="true"></div>
 
+  <!-- NAVBAR -->
   <nav>
     <a href="index.html" class="logo">
       <div class="ditto-logo-nav">
@@ -279,165 +364,71 @@
       </div>
       <span class="logo-text">Ditto.</span>
     </a>
+    <a href="index.html" class="back-btn">&#8592; Back to Home</a>
   </nav>
 
-  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-
-  <div class="quiz-container">
-    <div class="step-indicator">Question <span id="currentStep">1</span> of <span id="totalSteps">10</span></div>
-
-    <!-- Q1 -->
-    <div class="question-card active" data-q="1" data-dim="energy">
-      <div class="question-number">Question 1</div>
-      <div class="question-text">When you've had a long or tiring day, what helps you feel better?</div>
-      <div class="option" data-val="social" data-k="A"><div class="option-letter">A</div><div class="option-text">Talking to people about it</div></div>
-      <div class="option" data-val="quiet" data-k="B"><div class="option-letter">B</div><div class="option-text">Being alone in silence</div></div>
-      <div class="option" data-val="balanced" data-k="C"><div class="option-letter">C</div><div class="option-text">A bit of both, depends on the day</div></div>
-      <div class="option" data-val="quiet" data-k="D"><div class="option-letter">D</div><div class="option-text">Doing something active alone, like walking or listening to music</div></div>
-    </div>
-
-    <!-- Q2 -->
-    <div class="question-card" data-q="2" data-dim="energy">
-      <div class="question-number">Question 2</div>
-      <div class="question-text">When you are feeling low or upset, what do you usually do first?</div>
-      <div class="option" data-val="social" data-k="A"><div class="option-letter">A</div><div class="option-text">Talk to someone about what I'm feeling</div></div>
-      <div class="option" data-val="balanced" data-k="B"><div class="option-letter">B</div><div class="option-text">Distract myself with something else, like scrolling or watching something</div></div>
-      <div class="option" data-val="quiet" data-k="C"><div class="option-letter">C</div><div class="option-text">Sit alone with the feeling and think it through</div></div>
-      <div class="option" data-val="quiet" data-k="D"><div class="option-letter">D</div><div class="option-text">Keep myself busy so I don't have to think about it</div></div>
-    </div>
-
-    <!-- Q3 -->
-    <div class="question-card" data-q="3" data-dim="energy">
-      <div class="question-number">Question 3</div>
-      <div class="question-text">How often do small problems or setbacks ruin your mood for the whole day?</div>
-      <div class="option" data-val="social" data-k="A"><div class="option-letter">A</div><div class="option-text">Almost every time</div></div>
-      <div class="option" data-val="balanced" data-k="B"><div class="option-letter">B</div><div class="option-text">Quite often</div></div>
-      <div class="option" data-val="quiet" data-k="C"><div class="option-letter">C</div><div class="option-text">Rarely</div></div>
-      <div class="option" data-val="quiet" data-k="D"><div class="option-letter">D</div><div class="option-text">Almost never</div></div>
-    </div>
-
-    <!-- Q4 -->
-    <div class="question-card" data-q="4" data-dim="heart">
-      <div class="question-number">Question 4</div>
-      <div class="question-text">What kind of conversation do you enjoy the most?</div>
-      <div class="option" data-val="deep" data-k="A"><div class="option-letter">A</div><div class="option-text">Deep talks about life, meaning, or big ideas</div></div>
-      <div class="option" data-val="practical" data-k="B"><div class="option-letter">B</div><div class="option-text">Practical talks about plans, goals, or real problems</div></div>
-      <div class="option" data-val="light" data-k="C"><div class="option-letter">C</div><div class="option-text">Light and fun talks, jokes, random topics</div></div>
-      <div class="option" data-val="none" data-k="D"><div class="option-letter">D</div><div class="option-text">It depends completely on my mood that day</div></div>
-    </div>
-
-    <!-- Q5 -->
-    <div class="question-card" data-q="5" data-dim="heart">
-      <div class="question-number">Question 5</div>
-      <div class="question-text">When a friend shares a problem with you, what do you naturally do?</div>
-      <div class="option" data-val="deep" data-k="A"><div class="option-letter">A</div><div class="option-text">Just listen and make them feel understood</div></div>
-      <div class="option" data-val="practical" data-k="B"><div class="option-letter">B</div><div class="option-text">Try to give advice or solutions</div></div>
-      <div class="option" data-val="deep" data-k="C"><div class="option-letter">C</div><div class="option-text">Share a similar experience I've been through</div></div>
-      <div class="option" data-val="practical" data-k="D"><div class="option-letter">D</div><div class="option-text">Ask more questions to understand them better</div></div>
-    </div>
-
-    <!-- Q6 -->
-    <div class="question-card" data-q="6" data-dim="heart">
-      <div class="question-number">Question 6</div>
-      <div class="question-text">When you share something personal, what do you want from the other person?</div>
-      <div class="option" data-val="deep" data-k="A"><div class="option-letter">A</div><div class="option-text">For them to say "I understand" or "me too"</div></div>
-      <div class="option" data-val="practical" data-k="B"><div class="option-letter">B</div><div class="option-text">For them to question or challenge my thinking</div></div>
-      <div class="option" data-val="light" data-k="C"><div class="option-letter">C</div><div class="option-text">Nothing really, I just want to express it</div></div>
-      <div class="option" data-val="deep" data-k="D"><div class="option-letter">D</div><div class="option-text">For them to ask more about how I feel</div></div>
-    </div>
-
-    <!-- Q7 -->
-    <div class="question-card" data-q="7" data-dim="heart">
-      <div class="question-number">Question 7</div>
-      <div class="question-text">How often do you feel like no one really understands you?</div>
-      <div class="option" data-val="deep" data-k="A"><div class="option-letter">A</div><div class="option-text">Very often</div></div>
-      <div class="option" data-val="deep" data-k="B"><div class="option-letter">B</div><div class="option-text">Sometimes</div></div>
-      <div class="option" data-val="light" data-k="C"><div class="option-letter">C</div><div class="option-text">Rarely</div></div>
-      <div class="option" data-val="light" data-k="D"><div class="option-letter">D</div><div class="option-text">Almost never</div></div>
-    </div>
-
-    <!-- Q8 -->
-    <div class="question-card" data-q="8" data-dim="drive">
-      <div class="question-number">Question 8</div>
-      <div class="question-text">Right now in your life, what matters to you the most?</div>
-      <div class="option" data-val="connector" data-k="A"><div class="option-letter">A</div><div class="option-text">Feeling connected to people</div></div>
-      <div class="option" data-val="achiever" data-k="B"><div class="option-letter">B</div><div class="option-text">Growing and achieving things</div></div>
-      <div class="option" data-val="explorer" data-k="C"><div class="option-letter">C</div><div class="option-text">Having freedom and independence</div></div>
-      <div class="option" data-val="grounded" data-k="D"><div class="option-letter">D</div><div class="option-text">Feeling safe and secure</div></div>
-      <div class="option" data-val="explorer" data-k="E"><div class="option-letter">E</div><div class="option-text">Finding meaning or purpose in life</div></div>
-    </div>
-
-    <!-- Q9 -->
-    <div class="question-card" data-q="9" data-dim="conflict">
-      <div class="question-number">Question 9</div>
-      <div class="question-text">When you disagree with someone, what do you usually do?</div>
-      <div class="option" data-val="Avoider" data-k="A"><div class="option-letter">A</div><div class="option-text">Avoid the conflict and let it go</div></div>
-      <div class="option" data-val="Confronter" data-k="B"><div class="option-letter">B</div><div class="option-text">Say what I think, even if it creates tension</div></div>
-      <div class="option" data-val="Compromiser" data-k="C"><div class="option-letter">C</div><div class="option-text">Try to find a middle ground</div></div>
-      <div class="option" data-val="Peacemaker" data-k="D"><div class="option-letter">D</div><div class="option-text">Agree with them just to keep the peace</div></div>
-      <button class="continue-btn" id="continueBtn" onclick="nextQuestion()">Continue</button>
-    </div>
-
-    <!-- Q10 -->
-    <div class="question-card" data-q="10" data-dim="mood">
-      <div class="question-number">Question 10</div>
-      <div class="question-text">Right now, how are you feeling? <span style="color:#64748b;font-size:14px;">(Choose up to 2)</span></div>
-      <div class="mood-grid">
-        <div class="mood-option" data-val="Excited">Excited</div>
-        <div class="mood-option" data-val="Anxious">Anxious</div>
-        <div class="mood-option" data-val="Content">Content</div>
-        <div class="mood-option" data-val="Lonely">Lonely</div>
-        <div class="mood-option" data-val="Hopeful">Hopeful</div>
-        <div class="mood-option" data-val="Numb">Numb</div>
-        <div class="mood-option" data-val="Motivated">Motivated</div>
-        <div class="mood-option" data-val="Overwhelmed">Overwhelmed</div>
+  <!-- LOGIN / SIGNUP CARD -->
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h2 id="formTitle">Welcome Back</h2>
+        <p id="formSubtitle">Sign in to continue your journey</p>
       </div>
-      <button class="continue-btn" id="continueBtn10" onclick="nextQuestion()">Continue</button>
-    </div>
 
-    <!-- RESULT / PROFILE SETUP -->
-    <div class="question-card result-card" id="resultCard">
-      <div class="result-title">Your DittoID is Ready</div>
-      <div class="result-sub">This is your unique identity on Ditto</div>
-
-      <div class="dittoid-display">
-        <div>
-          <div class="dittoid-label">Your DittoID</div>
-          <div class="dittoid-code" id="dittoidCode">d/---</div>
+      <form id="authForm" onsubmit="return false;">
+        <!-- Name field (only for signup) -->
+        <div class="form-group" id="nameGroup" style="display:none;">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name" autocomplete="name">
         </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required minlength="6">
+        </div>
+
+        <!-- Confirm Password (only for signup) -->
+        <div class="form-group" id="confirmGroup" style="display:none;">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Sign In</button>
+      </form>
+
+      <div class="divider">or</div>
+
+      <button class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+          <path fill="#4285F4" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#34A853" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="toggle-text">
+        <span id="toggleQuestion">Don't have an account?</span>
+        <a id="toggleLink" onclick="toggleMode()">Sign Up</a>
       </div>
-
-      <div class="dittoid-breakdown" id="dittoidBreakdown"></div>
-
-      <div class="result-sub" style="margin-bottom:16px;">Choose your avatar</div>
-      <div class="avatar-grid" id="avatarGrid">
-        <div class="avatar-option" data-avatar="1">&#129504;</div>
-        <div class="avatar-option" data-avatar="2">&#10084;&#65039;</div>
-        <div class="avatar-option" data-avatar="3">&#128064;</div>
-        <div class="avatar-option" data-avatar="4">&#128170;</div>
-        <div class="avatar-option" data-avatar="5">&#128066;</div>
-        <div class="avatar-option" data-avatar="6">&#128099;</div>
-        <div class="avatar-option" data-avatar="7">&#129782;</div>
-        <div class="avatar-option" data-avatar="8">&#129309;</div>
-        <div class="avatar-option" data-avatar="9">&#128068;</div>
-        <div class="avatar-option" data-avatar="10">&#9995;</div>
-      </div>
-
-      <div class="result-sub" style="margin-bottom:16px;">Write your bio</div>
-      <textarea class="bio-textarea" id="bioInput" placeholder="Tell the world who you are... (max 120 characters)" maxlength="120"></textarea>
-      <div class="bio-counter" id="bioCounter">0 / 120</div>
-
-      <button class="btn-finish" id="finishBtn" onclick="finishProfile()" disabled>Complete Profile</button>
     </div>
   </div>
 
+  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
+  <!-- ===== FIREBASE SDK ===== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js"; from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRU2XnvDbSMKlOqAMijcUGYPC4RKg9nPM",
@@ -453,240 +444,162 @@
     const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
-    let currentUser = null;
-    let currentQ = 1;
-    const totalQ = 10;
-    const answers = {};
-    let selectedMoods = [];
-    let selectedAvatar = null;
-    let dittoidObj = null;
-
-    const letterMap = {
-      energy: { social: 'S', quiet: 'Q', balanced: 'B' },
-      heart: { deep: 'D', practical: 'P', light: 'L' },
-      drive: { connector: 'C', achiever: 'A', explorer: 'E', grounded: 'G' }
-    };
-    const meaningMap = {
-      S: 'Social Spirit', Q: 'Quiet Spirit', B: 'Balanced Spirit',
-      D: 'Deep Soul', P: 'Practical Soul', L: 'Light Soul',
-      C: 'Connector', A: 'Achiever', E: 'Explorer', G: 'Grounded'
-    };
-
+    // Check auth state and redirect
     onAuthStateChanged(auth, async (user) => {
-      if (!user) { window.location.href = 'login.html'; return; }
-      currentUser = user;
-      const profileDoc = await getDoc(doc(db, 'users', user.uid));
-      if (profileDoc.exists() && profileDoc.data().profileComplete) {
-        window.location.href = 'profile.html';
+      if (user) {
+        console.log("User logged in:", user.uid);
+        // Check if profile is complete
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists() && userDoc.data().profileComplete) {
+            showToast('Welcome back, ' + (user.displayName || user.email) + '!', 'success');
+            setTimeout(() => { window.location.href = 'profile.html'; }, 1500);
+          } else {
+            showToast('Welcome! Complete your profile.', 'success');
+            setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+          }
+        } catch (err) {
+          console.error("Auth check error:", err);
+          showToast('Welcome! Complete your profile.', 'success');
+          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+        }
       }
     });
 
-    function updateProgress() {
-      const pct = ((currentQ - 1) / totalQ) * 100;
-      document.getElementById('progressFill').style.width = pct + '%';
-      document.getElementById('currentStep').textContent = currentQ;
-    }
+    // Read URL parameter to set initial mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    let isSignUp = (mode === 'signup');
 
-    function showQuestion(n) {
-      document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
-      const card = document.querySelector(`.question-card[data-q="${n}"]`);
-      if (card) card.classList.add('active');
-      updateProgress();
-    }
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const nameGroup = document.getElementById('nameGroup');
+    const confirmGroup = document.getElementById('confirmGroup');
+    const toggleQuestion = document.getElementById('toggleQuestion');
+    const toggleLink = document.getElementById('toggleLink');
+    const authForm = document.getElementById('authForm');
+    const googleBtn = document.getElementById('googleBtn');
 
-    // Auto-advance for Q1-Q8
-    document.querySelectorAll('.question-card[data-q="1"] .option, .question-card[data-q="2"] .option, .question-card[data-q="3"] .option, .question-card[data-q="4"] .option, .question-card[data-q="5"] .option, .question-card[data-q="6"] .option, .question-card[data-q="7"] .option, .question-card[data-q="8"] .option').forEach(opt => {
-      opt.addEventListener('click', function() {
-        const card = this.closest('.question-card');
-        const qNum = parseInt(card.dataset.q);
-        const dim = card.dataset.dim;
-        const val = this.dataset.val;
-        const k = this.dataset.k;
-
-        card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        answers[qNum] = { dim, val, k };
-
-        // Auto advance after 400ms delay for visual feedback
-        setTimeout(() => {
-          if (currentQ < totalQ) {
-            currentQ++;
-            showQuestion(currentQ);
-            // Show continue button for Q9 and Q10
-            if (currentQ === 9 || currentQ === 10) {
-              const btn = document.getElementById(currentQ === 10 ? 'continueBtn10' : 'continueBtn');
-              if (btn) btn.classList.add('show');
-            }
-          }
-        }, 400);
-      });
-    });
-
-    // Q9 options - show continue button but don't auto advance
-    document.querySelectorAll('.question-card[data-q="9"] .option').forEach(opt => {
-      opt.addEventListener('click', function() {
-        const card = this.closest('.question-card');
-        const qNum = parseInt(card.dataset.q);
-        const dim = card.dataset.dim;
-        const val = this.dataset.val;
-        const k = this.dataset.k;
-
-        card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        answers[qNum] = { dim, val, k };
-        document.getElementById('continueBtn').classList.add('show');
-      });
-    });
-
-    // Q10 mood selection
-    document.querySelectorAll('.mood-option').forEach(opt => {
-      opt.addEventListener('click', function() {
-        const val = this.dataset.val;
-        if (this.classList.contains('selected')) {
-          this.classList.remove('selected');
-          selectedMoods = selectedMoods.filter(m => m !== val);
-        } else {
-          if (selectedMoods.length >= 2) {
-            showToast('You can only select up to 2 moods.', 'error');
-            return;
-          }
-          this.classList.add('selected');
-          selectedMoods.push(val);
-        }
-        answers[10] = { dim: 'mood', val: selectedMoods };
-        if (selectedMoods.length > 0) {
-          document.getElementById('continueBtn10').classList.add('show');
-        }
-      });
-    });
-
-    window.nextQuestion = function() {
-      if (currentQ === 9 && !answers[9]) { showToast('Please select an answer first.', 'error'); return; }
-      if (currentQ === 10 && selectedMoods.length === 0) { showToast('Please select at least 1 mood.', 'error'); return; }
-
-      if (currentQ < totalQ) {
-        currentQ++;
-        showQuestion(currentQ);
-        if (currentQ === 10) {
-          document.getElementById('continueBtn10').classList.add('show');
-        }
+    // Apply initial mode based on URL
+    function applyMode() {
+      if (isSignUp) {
+        formTitle.textContent = 'Create Account';
+        formSubtitle.textContent = 'Join Ditto and find your people';
+        submitBtn.textContent = 'Sign Up';
+        nameGroup.style.display = 'block';
+        confirmGroup.style.display = 'block';
+        toggleQuestion.textContent = 'Already have an account?';
+        toggleLink.textContent = 'Sign In';
+        document.getElementById('password').setAttribute('autocomplete', 'new-password');
       } else {
-        calculateResult();
+        formTitle.textContent = 'Welcome Back';
+        formSubtitle.textContent = 'Sign in to continue your journey';
+        submitBtn.textContent = 'Sign In';
+        nameGroup.style.display = 'none';
+        confirmGroup.style.display = 'none';
+        toggleQuestion.textContent = "Don't have an account?";
+        toggleLink.textContent = 'Sign Up';
+        document.getElementById('password').setAttribute('autocomplete', 'current-password');
       }
+    }
+
+    // Run on page load
+    applyMode();
+
+    window.toggleMode = function() {
+      isSignUp = !isSignUp;
+      applyMode();
     };
 
-    function calculateResult() {
-      const tally = { energy: {}, heart: {} };
-      let conflictStyle = '';
+    // Email/Password Auth
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const name = document.getElementById('name').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value;
 
-      for (let i = 1; i <= 9; i++) {
-        const ans = answers[i];
-        if (!ans) continue;
-        if (ans.dim === 'energy' || ans.dim === 'heart') {
-          if (ans.val !== 'none') {
-            tally[ans.dim][ans.val] = (tally[ans.dim][ans.val] || 0) + 1;
-          }
-        }
-        if (ans.dim === 'conflict') conflictStyle = ans.val;
+      if (!email || !password) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
       }
 
-      function winner(dim, fallback) {
-        const t = tally[dim];
-        let best = null, bestCount = -1, tied = false;
-        for (const v in t) {
-          if (t[v] > bestCount) { best = v; bestCount = t[v]; tied = false; }
-          else if (t[v] === bestCount) { tied = true; }
-        }
-        return (!best || tied) ? fallback : best;
-      }
-
-      const energy = winner('energy', 'balanced');
-      const heart = winner('heart', 'deep');
-      const drive = answers[8].val;
-
-      dittoidObj = { energy, heart, drive };
-      const code = `d/${letterMap.energy[energy]}${letterMap.heart[heart]}${letterMap.drive[drive]}`;
-
-      document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('resultCard').classList.add('active');
-      document.querySelector('.step-indicator').style.display = 'none';
-      document.getElementById('progressFill').style.width = '100%';
-
-      document.getElementById('dittoidCode').textContent = code;
-
-      const breakdown = document.getElementById('dittoidBreakdown');
-      breakdown.innerHTML = `
-        <div class="breakdown-item"><div class="letter">${letterMap.energy[energy]}</div><div class="meaning">${meaningMap[letterMap.energy[energy]]}</div></div>
-        <div class="breakdown-item"><div class="letter">${letterMap.heart[heart]}</div><div class="meaning">${meaningMap[letterMap.heart[heart]]}</div></div>
-        <div class="breakdown-item"><div class="letter">${letterMap.drive[drive]}</div><div class="meaning">${meaningMap[letterMap.drive[drive]]}</div></div>
-      `;
-
-      dittoidObj.conflictStyle = conflictStyle;
-      dittoidObj.moodTags = selectedMoods;
-    }
-
-    // Avatar selection
-    document.querySelectorAll('.avatar-option').forEach(opt => {
-      opt.addEventListener('click', function() {
-        document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        selectedAvatar = this.dataset.avatar;
-        checkFinishReady();
-      });
-    });
-
-    // Bio input
-    document.getElementById('bioInput').addEventListener('input', function() {
-      const len = this.value.length;
-      document.getElementById('bioCounter').textContent = len + ' / 120';
-      checkFinishReady();
-    });
-
-    function checkFinishReady() {
-      const bio = document.getElementById('bioInput').value.trim();
-      document.getElementById('finishBtn').disabled = !(selectedAvatar && bio.length > 0);
-    }
-
-    window.finishProfile = async function() {
-      if (!currentUser) { showToast('Please log in first.', 'error'); return; }
-      const bio = document.getElementById('bioInput').value.trim();
-      if (!selectedAvatar || !bio) { showToast('Please select an avatar and write a bio.', 'error'); return; }
-
-      document.getElementById('finishBtn').disabled = true;
-      document.getElementById('finishBtn').textContent = 'Saving...';
-
-      const code = `d/${letterMap.energy[dittoidObj.energy]}${letterMap.heart[dittoidObj.heart]}${letterMap.drive[dittoidObj.drive]}`;
+      submitBtn.disabled = true;
+      submitBtn.textContent = isSignUp ? 'Creating Account...' : 'Signing In...';
 
       try {
-        await setDoc(doc(db, 'users', currentUser.uid), {
-          uid: currentUser.uid,
-          email: currentUser.email,
-          displayName: currentUser.displayName || '',
-          dittoid: dittoidObj,
-          dittoidCode: code,
-          conflictStyle: dittoidObj.conflictStyle,
-          moodTags: dittoidObj.moodTags,
-          avatar: selectedAvatar,
-          bio: bio,
-          profileComplete: true,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          dailyMatchesUsed: 0,
-          lastMatchReset: new Date().toISOString(),
-          dittsCount: 0,
-          dittosCount: 0,
-          matchesCount: 0
-        });
-        showToast('Profile created! Welcome to Ditto.', 'success');
-        setTimeout(() => window.location.href = 'profile.html', 1500);
-      } catch (err) {
-        showToast('Error saving profile: ' + err.message, 'error');
-        document.getElementById('finishBtn').disabled = false;
-        document.getElementById('finishBtn').textContent = 'Complete Profile';
+        if (isSignUp) {
+          if (password !== confirmPassword) {
+            showToast('Passwords do not match.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign Up';
+            return;
+          }
+          if (password.length < 6) {
+            showToast('Password must be at least 6 characters.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign Up';
+            return;
+          }
+
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          if (name) {
+            await updateProfile(userCredential.user, { displayName: name });
+          }
+          showToast('Account created successfully! Welcome to Ditto.', 'success');
+          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+          showToast('Signed in successfully!', 'success');
+          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+        }
+      } catch (error) {
+        let msg = error.message;
+        if (error.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
+        if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
+        if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
+        if (error.code === 'auth/email-already-in-use') msg = 'An account already exists with this email.';
+        if (error.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
+        if (error.code === 'auth/weak-password') msg = 'Password is too weak. Use at least 6 characters.';
+        showToast(msg, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+      }
+    });
+
+    // Google Sign In
+    window.signInWithGoogle = async function() {
+      googleBtn.disabled = true;
+      try {
+        const result = await signInWithPopup(auth, provider);
+        console.log("Google sign-in success:", result.user.uid);
+        showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
+        // Check profile and redirect
+        try {
+          const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+          if (userDoc.exists() && userDoc.data().profileComplete) {
+            setTimeout(() => { window.location.href = 'profile.html'; }, 1500);
+          } else {
+            setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+          }
+        } catch (err) {
+          setTimeout(() => { window.location.href = 'quiz.html'; }, 1500);
+        }
+      } catch (error) {
+        let msg = error.message;
+        if (error.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
+        if (error.code === 'auth/popup-blocked') msg = 'Popup was blocked. Please allow popups for this site.';
+        showToast(msg, 'error');
+      } finally {
+        googleBtn.disabled = false;
       }
     };
 
+    // Toast
     window.showToast = function(msg, type = '') {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -694,5 +607,6 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     };
   </script>
+
 </body>
 </html>
