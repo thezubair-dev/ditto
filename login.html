@@ -202,7 +202,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.03);
       color: white;
-      font-size: 16px; /* Prevents iOS zoom on focus */
+      font-size: 16px;
       font-family: 'Inter', sans-serif;
       outline: none;
       transition: all 0.3s ease;
@@ -352,7 +352,7 @@
       }
     }
   </style>
-
+<base>
 <base target="_blank">
 </head>
 <body>
@@ -368,7 +368,7 @@
       </div>
       <span class="logo-text">Ditto.</span>
     </a>
-    <button class="back-btn" id="logoutBtn" onclick="logoutUser()" style="display:none;">&#8592; Logout</button>
+    <button type="button" class="back-btn" id="logoutBtn" onclick="logoutUser()" style="display:none;">&#8592; Logout</button>
     <a href="index.html" class="back-btn" id="backHomeBtn">&#8592; Back to Home</a>
   </nav>
 
@@ -381,7 +381,8 @@
       </div>
 
       <form id="authForm" onsubmit="return false;">
-
+        <!-- Name field (only for signup) -->
+        
 
         <div class="form-group">
           <label for="email">Email</label>
@@ -404,7 +405,7 @@
 
       <div class="divider">or</div>
 
-      <button type="button" class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
+      <button class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
         <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
           <path fill="#4285F4" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -447,34 +448,17 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // Toast helper (defined early to avoid hoisting issues)
-    function showToast(msg, type = '') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast show' + (type ? ' ' + type : '');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
     // Check auth state and redirect
-    // Check URL mode
     const urlParams = new URLSearchParams(window.location.search);
     const urlMode = urlParams.get('mode');
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log("User logged in:", user.uid);
-        // Show logout button, hide back home
-        const logoutBtn = document.getElementById('logoutBtn');
-        const backHomeBtn = document.getElementById('backHomeBtn');
-        if (logoutBtn) logoutBtn.style.display = 'inline-flex';
-        if (backHomeBtn) backHomeBtn.style.display = 'none';
-
         // Only auto-redirect if NOT in signup mode intentionally
         if (urlMode === 'signup') {
-          // User wants to create new account - stay on page
           return;
         }
-
         // Check if profile is complete
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -501,7 +485,7 @@
     const formTitle = document.getElementById('formTitle');
     const formSubtitle = document.getElementById('formSubtitle');
     const submitBtn = document.getElementById('submitBtn');
-    // nameGroup removed
+    
     const confirmGroup = document.getElementById('confirmGroup');
     const toggleQuestion = document.getElementById('toggleQuestion');
     const toggleLink = document.getElementById('toggleLink');
@@ -514,7 +498,6 @@
         formTitle.textContent = 'Create Account';
         formSubtitle.textContent = 'Join Ditto and find your people';
         submitBtn.textContent = 'Sign Up';
-        // name field removed
         confirmGroup.style.display = 'block';
         toggleQuestion.textContent = 'Already have an account?';
         toggleLink.textContent = 'Sign In';
@@ -523,7 +506,6 @@
         formTitle.textContent = 'Welcome Back';
         formSubtitle.textContent = 'Sign in to continue your journey';
         submitBtn.textContent = 'Sign In';
-        // nameGroup removed
         confirmGroup.style.display = 'none';
         toggleQuestion.textContent = "Don't have an account?";
         toggleLink.textContent = 'Sign Up';
@@ -535,14 +517,13 @@
     applyMode();
 
     window.toggleMode = async function() {
-      // If switching to signup while logged in, sign out first
       if (!isSignUp && auth.currentUser) {
         await signOut(auth);
         localStorage.clear();
       }
       isSignUp = !isSignUp;
       applyMode();
-    }
+    };
 
     // Logout function
     window.logoutUser = async function() {
@@ -553,14 +534,13 @@
       } catch (err) {
         console.error('Logout error:', err);
       }
-    };;
+    };
 
     // Email/Password Auth
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      // name field removed
       const confirmPassword = document.getElementById('confirmPassword').value;
 
       if (!email || !password) {
@@ -587,7 +567,6 @@
           }
 
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          // name field removed - no displayName update
           showToast('Account created successfully! Welcome to Ditto.', 'success');
           // Redirect handled by onAuthStateChanged
         } else {
@@ -611,7 +590,6 @@
     });
 
     // Google Sign In
-    // Detect mobile devices
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
     }
@@ -620,15 +598,11 @@
       googleBtn.disabled = true;
       try {
         if (isMobile()) {
-          // Use redirect for mobile (popups blocked on mobile browsers)
           await signInWithRedirect(auth, provider);
-          // Page will redirect to Google and back
         } else {
-          // Use popup for desktop
           const result = await signInWithPopup(auth, provider);
           console.log("Google sign-in success:", result.user.uid);
           showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
-          // Redirect handled by onAuthStateChanged
         }
       } catch (error) {
         let msg = error.message;
@@ -639,23 +613,26 @@
       }
     };
 
-    // Handle redirect result (for mobile Google sign-in)
+    // Handle redirect result for mobile
     getRedirectResult(auth).then((result) => {
       if (result) {
         console.log("Google redirect sign-in success:", result.user.uid);
         showToast('Welcome, ' + (result.user.displayName || result.user.email) + '!', 'success');
-        // Redirect handled by onAuthStateChanged
       }
     }).catch((error) => {
       if (error.code !== 'auth/null-user') {
         console.error("Redirect result error:", error);
-        let msg = error.message;
-        if (error.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
-        showToast(msg, 'error');
+        showToast('Sign-in error: ' + error.message, 'error');
       }
     });
 
-    
+    // Toast
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
   </script>
 
 </body>
